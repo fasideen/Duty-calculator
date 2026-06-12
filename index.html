@@ -609,7 +609,7 @@ const i18n = {
     overridePlaceholder: 'Leave blank to use database value',
     stepA: 'FOB × Exchange Rate', stepB: 'Insurance (A × 1.5%)', stepC: 'B + Shipping', stepD: 'T/S Value (A + C)',
     stepE: (pct) => `Duty (D × ${pct})`,
-    breakdownTitle: 'Total Landed Cost Breakdown',
+    breakdownTitle: 'Cost Composition',
     legendFob: 'Vehicle (FOB)', legendFees: 'Insurance & Shipping', legendDuty: 'Import Duty',
     resultLabel: 'Estimated Import Duty',
     printPdf: 'Print / PDF', copyResultBtn: 'Copy Result', copied: 'Copied ✓', clear: 'Clear',
@@ -630,7 +630,8 @@ const i18n = {
     compareEmpty: 'Tick up to 3 vehicles using the checkboxes in the table to compare them side by side.',
     compareBarText: (n) => `${n} vehicle${n>1?'s':''} selected for comparison`,
     compareView: 'View Comparison', compareClear: 'Clear', compareRemove: 'Remove',
-    compareLabels: { brand: 'Vehicle', cc: 'Engine', cur: 'Currency', fob: 'FOB', dutyPct: 'Duty Rate', dutyAmt: 'Estimated Duty', totalCost: 'Total Landed Cost' },
+    compareLabels: { brand: 'Vehicle', cc: 'Engine', cur: 'Currency', fob: 'FOB', dutyPct: 'Duty Rate', dutyAmt: 'Estimated Duty', totalCost: 'Vehicle Value + Import Duty' },
+    excludesNote: 'Excludes excise duty, sales tax (SST), JPJ registration & road tax — calculated separately.',
     printTitle: 'Kansai Group — Import Duty Estimate',
     printSub: (date) => `Generated ${date} · For reference only, subject to official customs assessment`,
   },
@@ -669,7 +670,7 @@ const i18n = {
     overridePlaceholder: 'Biarkan kosong untuk guna nilai pangkalan data',
     stepA: 'FOB × Kadar Tukaran', stepB: 'Insurans (A × 1.5%)', stepC: 'B + Penghantaran', stepD: 'Nilai T/S (A + C)',
     stepE: (pct) => `Duti (D × ${pct})`,
-    breakdownTitle: 'Pecahan Jumlah Kos Mendarat',
+    breakdownTitle: 'Komposisi Kos',
     legendFob: 'Kenderaan (FOB)', legendFees: 'Insurans & Penghantaran', legendDuty: 'Duti Import',
     resultLabel: 'Anggaran Duti Import',
     printPdf: 'Cetak / PDF', copyResultBtn: 'Salin Keputusan', copied: 'Disalin ✓', clear: 'Kosongkan',
@@ -690,7 +691,8 @@ const i18n = {
     compareEmpty: 'Tandakan sehingga 3 kenderaan menggunakan kotak semak dalam jadual untuk membandingkannya.',
     compareBarText: (n) => `${n} kenderaan dipilih untuk perbandingan`,
     compareView: 'Lihat Perbandingan', compareClear: 'Kosongkan', compareRemove: 'Buang',
-    compareLabels: { brand: 'Kenderaan', cc: 'Enjin', cur: 'Mata Wang', fob: 'FOB', dutyPct: 'Kadar Duti', dutyAmt: 'Anggaran Duti', totalCost: 'Jumlah Kos Mendarat' },
+    compareLabels: { brand: 'Kenderaan', cc: 'Enjin', cur: 'Mata Wang', fob: 'FOB', dutyPct: 'Kadar Duti', dutyAmt: 'Anggaran Duti', totalCost: 'Nilai Kenderaan + Duti Import' },
+    excludesNote: 'Tidak termasuk duti eksais, cukai jualan (SST), pendaftaran JPJ & cukai jalan — dikira berasingan.',
     printTitle: 'Kansai Group — Anggaran Duti Import',
     printSub: (date) => `Dijana ${date} · Untuk rujukan sahaja, tertakluk kepada penilaian rasmi kastam`,
   },
@@ -1315,7 +1317,8 @@ function renderCompare() {
       <tr><td class="metric-label">${L.totalCost}</td>${rows.map(r => `<td class="compare-total">${rm(r.total)}</td>`).join('')}</tr>
     </tbody>
   </table>
-  </div>`;
+  </div>
+  <div style="font-size:11px; color:var(--ink-soft); margin-top:10px; padding:0 4px;">*${t('excludesNote')}</div>`;
 }
 
 // ═══════════════════════════════════════
@@ -1445,6 +1448,7 @@ function renderCalc() {
         <span><span class="dot fees"></span>${t('legendFees')} — ${pctFees.toFixed(0)}%</span>
         <span><span class="dot duty"></span>${t('legendDuty')} — ${pctDuty.toFixed(0)}%</span>
       </div>
+      <div style="font-size:11px; color:var(--ink-soft); margin-top:8px;">*${t('excludesNote')}</div>
     </div>
 
     <div class="result-box">
@@ -1511,6 +1515,7 @@ ${t('dutySuffix')}: ${v.duty.lbl}
 
 ${t('resultLabel').toUpperCase()}: ${rm(v.E)}
 ${t('compareLabels').totalCost}: ${rm(v.total)}
+*${t('excludesNote')}
 
 ${t('printSub')('').split('·')[1]?.trim() || ''}`;
 
@@ -1571,7 +1576,8 @@ function sendWhatsApp(bil) {
 ${v.brand} ${v.model}
 ${evLbl} · ${v.cur} · ${ageLbl}
 ${t('resultLabel')}: ${rm(v.E)}
-${t('compareLabels').totalCost}: ${rm(v.total)}`;
+${t('compareLabels').totalCost}: ${rm(v.total)}
+*${t('excludesNote')}`;
 
   window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
 }
