@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kansai Group — Import Duty Calculator</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,4 93,27 93,73 50,96 7,73 7,27' fill='%23DC2626'/%3E%3Ctext x='50' y='63' text-anchor='middle' fill='%23fff' font-family='Arial, sans-serif' font-weight='700' font-size='34'%3EKG%3C/text%3E%3C/svg%3E">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
@@ -53,7 +54,6 @@ h1, h2, h3, .display { font-family: 'Space Grotesk', sans-serif; }
   top: 0;
   z-index: 50;
   border-bottom: 3px solid var(--red);
-  box-shadow: inset 0 -3px 0 var(--gold);
 }
 .header-left { display: flex; align-items: center; gap: 14px; }
 .logo-mark {
@@ -353,7 +353,7 @@ tbody tr.active-row td { border-bottom-color: #FBD5D5; }
 /* ── COST BREAKDOWN ── */
 .breakdown { margin-top: 18px; }
 .breakdown-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-soft); margin-bottom: 9px; font-family: 'Oswald', sans-serif; }
-.breakdown-bar { display: flex; height: 12px; border-radius: 6px; overflow: hidden; }
+.breakdown-bar { display: flex; height: 16px; border-radius: 8px; overflow: hidden; }
 .breakdown-seg { transition: flex-basis 0.3s ease; }
 .breakdown-seg.fob  { background: var(--ink); }
 .breakdown-seg.fees { background: var(--ink-soft); }
@@ -386,7 +386,8 @@ tbody tr.active-row td { border-bottom-color: #FBD5D5; }
 #calcBody > * { animation: calcFadeIn 0.35s ease-out; }
 
 /* ── ACTIONS ── */
-.action-row { display: flex; gap: 10px; margin-top: 14px; }
+.action-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+.action-row .btn { flex: 1 1 30%; min-width: 110px; }
 .btn {
   flex: 1;
   padding: 11px;
@@ -407,6 +408,17 @@ tbody tr.active-row td { border-bottom-color: #FBD5D5; }
 .empty { text-align: center; padding: 36px 16px; color: var(--ink-soft); }
 .empty .icon { width: 44px; height: 44px; margin: 0 auto 12px; color: var(--ink-soft); opacity: 0.4; }
 .empty p { font-size: 13px; line-height: 1.6; }
+
+/* ── FOOTER ── */
+.site-footer {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 4px 20px 32px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--ink-soft);
+  line-height: 1.7;
+}
 
 /* ── LOADING ── */
 .loading-screen {
@@ -435,6 +447,7 @@ tbody tr.active-row td { border-bottom-color: #FBD5D5; }
   }
   .print-header .ph-title { font-family: 'Oswald', sans-serif; font-size: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink); }
   .print-header .ph-sub { font-size: 12px; color: var(--ink-mid); margin-top: 2px; }
+  #calcBody > * { animation: none !important; opacity: 1 !important; transform: none !important; }
 }
 
 @media (max-width: 980px) {
@@ -479,11 +492,18 @@ tbody tr.active-row td { border-bottom-color: #FBD5D5; }
   <div class="loading-screen">Loading vehicle database…</div>
 </div>
 
+<div class="site-footer">
+  Estimates only, for reference purposes. Exchange rates and duty calculations are based on figures you enter and may differ from the official assessment by the Royal Malaysian Customs Department.
+  Official rates: <a href="http://customsgc.gov.my/cgi-bin/exchange.cgi" target="_blank" style="color:var(--ink-mid)">customsgc.gov.my</a>.
+  © <span id="footYear"></span> Kansai Group.
+</div>
+
 <script>
 // ═══════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════
 const PER_PAGE = 25;
+document.getElementById('footYear').textContent = new Date().getFullYear();
 let DB = [];          // [no, brand, model, cc, currency, fob12, fob24, fob36, fob48, fob60]
 let filtered = [];
 let pg = 1;
@@ -681,6 +701,7 @@ function buildPage() {
   `;
 
   initEvents();
+  loadRates();
   showEmptyPrompt();
 }
 
@@ -695,10 +716,10 @@ function initEvents() {
   document.getElementById('sSort').addEventListener('change', doFilter);
   document.getElementById('sAge').addEventListener('change', () => { doFilter(); if (sel) renderCalc(); });
 
-  document.getElementById('rJPY').addEventListener('input', () => { syncBadge(); if (sel) renderCalc(); });
-  document.getElementById('rGBP').addEventListener('input', () => { if (sel) renderCalc(); });
-  document.getElementById('rAUD').addEventListener('input', () => { if (sel) renderCalc(); });
-  document.getElementById('rShip').addEventListener('input', () => { if (sel) renderCalc(); });
+  document.getElementById('rJPY').addEventListener('input', () => { syncBadge(); saveRates(); if (sel) renderCalc(); });
+  document.getElementById('rGBP').addEventListener('input', () => { saveRates(); if (sel) renderCalc(); });
+  document.getElementById('rAUD').addEventListener('input', () => { saveRates(); if (sel) renderCalc(); });
+  document.getElementById('rShip').addEventListener('input', () => { saveRates(); if (sel) renderCalc(); });
 
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.ac-wrap')) {
@@ -852,6 +873,34 @@ function rm(n) {
 function syncBadge() {
   const v = parseFloat(document.getElementById('rJPY').value) || 0;
   document.getElementById('jpyBadge').textContent = v.toFixed(4);
+}
+
+// ═══════════════════════════════════════
+// REMEMBER EXCHANGE RATES (localStorage)
+// ═══════════════════════════════════════
+function saveRates() {
+  try {
+    const rates = {
+      rJPY: document.getElementById('rJPY').value,
+      rGBP: document.getElementById('rGBP').value,
+      rAUD: document.getElementById('rAUD').value,
+      rShip: document.getElementById('rShip').value,
+    };
+    localStorage.setItem('kansaiDutyRates', JSON.stringify(rates));
+  } catch (e) { /* localStorage unavailable — ignore */ }
+}
+
+function loadRates() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('kansaiDutyRates'));
+    if (!saved) return;
+    ['rJPY','rGBP','rAUD','rShip'].forEach(id => {
+      if (saved[id] !== undefined && saved[id] !== '') {
+        document.getElementById(id).value = saved[id];
+      }
+    });
+    syncBadge();
+  } catch (e) { /* ignore */ }
 }
 
 // ═══════════════════════════════════════
@@ -1060,11 +1109,78 @@ function renderCalc() {
 
     <div class="action-row">
       <button class="btn btn-primary" onclick="window.print()">Print / PDF</button>
+      <button class="btn btn-ghost" id="copyBtn" onclick="copyResult(${bil})">Copy Result</button>
       <button class="btn btn-ghost" onclick="clearSel()">Clear</button>
     </div>
   `;
 
   document.getElementById('ovFOB').addEventListener('input', renderCalc);
+}
+
+// ═══════════════════════════════════════
+// COPY RESULT TO CLIPBOARD
+// ═══════════════════════════════════════
+function copyResult(bil) {
+  const car = DB.find(c => c[0] === bil);
+  if (!car) return;
+  const [, brand, model, cc, cur] = car;
+  const fob = getFOB(car);
+  const rate = getRate(cur);
+  const duty = getDuty(cc);
+  const ship = parseFloat(document.getElementById('rShip').value) || 0;
+  const ovEl = document.getElementById('ovFOB');
+  const ov = ovEl ? parseFloat(ovEl.value) : NaN;
+  const useFOB = (!isNaN(ov) && ov > 0) ? ov : fob;
+
+  const A = useFOB * rate;
+  const B = A * 0.015;
+  const C = B + ship;
+  const D = A + C;
+  const E = D * duty.pct;
+  const total = D + E;
+
+  const ageLabels = ['12–24 months','24–36 months','36–48 months','48–60 months','60+ months'];
+  const ageLbl = ageLabels[parseInt(document.getElementById('sAge').value)];
+
+  const text =
+`Kansai Group — Import Duty Estimate
+${brand} ${model}
+${cc === 0 ? 'Electric / EV' : cc.toLocaleString() + ' cc'} · ${cur} · ${ageLbl}
+
+FOB: ${useFOB.toLocaleString()} ${cur} (rate ${rate.toFixed(4)})
+Vehicle value (A): ${rm(A)}
+Insurance + Shipping (C): ${rm(C)}
+T/S Value (D): ${rm(D)}
+Duty rate: ${duty.lbl}
+
+ESTIMATED IMPORT DUTY: ${rm(E)}
+Total landed cost (D+E): ${rm(total)}
+
+Estimate only — subject to official Customs assessment.`;
+
+  const btn = document.getElementById('copyBtn');
+  const showCopied = () => {
+    const original = btn.textContent;
+    btn.textContent = 'Copied ✓';
+    setTimeout(() => { btn.textContent = original; }, 1800);
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(showCopied).catch(() => fallbackCopy(text, showCopied));
+  } else {
+    fallbackCopy(text, showCopied);
+  }
+}
+
+function fallbackCopy(text, cb) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); cb(); } catch (e) {}
+  document.body.removeChild(ta);
 }
 
 function clearSel() {
