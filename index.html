@@ -82,6 +82,16 @@ h1, h2, h3, .display { font-family: 'Space Grotesk', sans-serif; }
 }
 .rate-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red); }
 .header-count { font-size: 12px; color: rgba(255,255,255,0.55); font-weight: 500; font-family: 'Inter', sans-serif; text-transform: none; letter-spacing: 0; }
+.lang-toggle {
+  display: flex; border: 1px solid rgba(255,255,255,0.18); border-radius: 8px; overflow: hidden;
+}
+.lang-toggle button {
+  background: transparent; color: rgba(255,255,255,0.6); border: none; cursor: pointer;
+  font-size: 11px; font-weight: 700; padding: 6px 10px; font-family: 'Inter', sans-serif;
+  letter-spacing: 0.05em; transition: all 0.15s;
+}
+.lang-toggle button.active { background: var(--red); color: #fff; }
+.lang-toggle button:not(.active):hover { color: #fff; }
 
 /* ── LAYOUT ── */
 .layout {
@@ -409,6 +419,42 @@ tbody tr.active-row td { border-bottom-color: #FBD5D5; }
 .empty .icon { width: 44px; height: 44px; margin: 0 auto 12px; color: var(--ink-soft); opacity: 0.4; }
 .empty p { font-size: 13px; line-height: 1.6; }
 
+/* ── COMPARE ── */
+.td-check { width: 36px; text-align: center; }
+.td-check input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--red); }
+.compare-bar {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+  background: var(--red-light); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  padding: 10px 20px; font-size: 12px; font-weight: 600; color: var(--red-dark);
+}
+.compare-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.compare-table th, .compare-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+.compare-table th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); font-weight: 700; white-space: nowrap; }
+.compare-table td.metric-label { font-weight: 600; color: var(--ink-mid); white-space: nowrap; }
+.compare-table .compare-model { font-weight: 700; font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.03em; font-size: 13px; }
+.compare-table .compare-sub { font-size: 11px; color: var(--ink-mid); font-weight: 400; text-transform: none; letter-spacing: 0; margin-top: 2px; }
+.compare-table .compare-duty { color: var(--red); font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+.compare-table .compare-total { color: var(--green); font-weight: 700; font-family: 'JetBrains Mono', monospace; font-size: 14px; }
+.compare-remove { background: none; border: none; color: var(--ink-soft); cursor: pointer; font-size: 11px; text-decoration: underline; padding: 0; margin-top: 4px; }
+.compare-empty { text-align: center; padding: 30px; color: var(--ink-soft); font-size: 13px; }
+
+/* ── FAQ ── */
+.faq-body { padding: 8px 20px; }
+.faq-item { border-bottom: 1px solid var(--border); }
+.faq-item:last-child { border-bottom: none; }
+.faq-q {
+  width: 100%; background: none; border: none; cursor: pointer; text-align: left;
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  padding: 14px 0; font-size: 13px; font-weight: 600; color: var(--ink); font-family: 'Inter', sans-serif;
+}
+.faq-icon { font-size: 18px; color: var(--red); font-weight: 700; flex-shrink: 0; transition: transform 0.2s; }
+.faq-a {
+  max-height: 0; overflow: hidden; transition: max-height 0.25s ease, padding 0.25s ease;
+  font-size: 13px; color: var(--ink-mid); line-height: 1.7;
+}
+.faq-a.open { max-height: 400px; padding-bottom: 14px; }
+.faq-icon.open { transform: rotate(45deg); }
+
 /* ── FOOTER ── */
 .site-footer {
   max-width: 980px;
@@ -433,7 +479,7 @@ tbody tr.active-row td { border-bottom-color: #FBD5D5; }
 /* ── PRINT ── */
 .print-header { display: none; }
 @media print {
-  .header, .search-row, .search-row-4, .table-wrap, .pagination, .rate-row, .rate-link, .action-row, .gauge-seg:not(.active), .gauge-label { display: none !important; }
+  .header, .search-row, .search-row-4, .table-wrap, .pagination, .rate-row, .rate-link, .action-row, .gauge-seg:not(.active), .gauge-label, .compare-bar, #compareCard, .faq-card, .lang-toggle, .td-check { display: none !important; }
   .layout { max-width: 100%; }
   body { background: white; }
   .card { box-shadow: none; border: 1px solid #ddd; }
@@ -483,6 +529,10 @@ tbody tr.active-row td { border-bottom-color: #FBD5D5; }
     </div>
   </div>
   <div class="header-right">
+    <div class="lang-toggle">
+      <button id="langEN" onclick="setLang('en')">EN</button>
+      <button id="langBM" onclick="setLang('bm')">BM</button>
+    </div>
     <span class="header-count" id="totalCount"></span>
     <span class="rate-pill"><span class="dot"></span>JPY <span id="jpyBadge">0.0315</span></span>
   </div>
@@ -515,6 +565,153 @@ const acState = {
   model: { items: [], idx: -1, onPick: null },
 };
 
+// Compare feature state
+let compareList = []; // array of car "no"
+
+// ═══════════════════════════════════════════════════
+// LANGUAGE / TRANSLATIONS
+// ═══════════════════════════════════════════════════
+let LANG = (function(){ try { return localStorage.getItem('kansaiLang') || 'en'; } catch(e){ return 'en'; } })();
+
+const i18n = {
+  en: {
+    subtitle: 'Import Duty Calculator',
+    vehicleList: 'Vehicle List',
+    brand: 'Brand',
+    modelKeywords: 'Model / Keywords',
+    brandPlaceholder: 'e.g. Toyota, Honda...',
+    modelPlaceholder: 'e.g. Alphard, Land Cruiser...',
+    vehicleAge: 'Vehicle Age',
+    ageLabels: ['12 – 24 months','24 – 36 months','36 – 48 months','48 – 60 months','60+ months'],
+    currency: 'Currency',
+    all: 'All',
+    ccRange: 'CC Range',
+    allCC: 'All CC',
+    sortFob: 'Sort FOB',
+    default: 'Default',
+    fobLowHigh: 'FOB Low → High',
+    fobHighLow: 'FOB High → Low',
+    thNo: '#', thBrand: 'Brand', thModel: 'Model', thCC: 'CC', thCur: 'Cur', thFob: 'FOB Value', thCompare: 'Compare',
+    prev: '← Prev', next: 'Next →',
+    vehicles: 'vehicles', totalLbl: 'total',
+    startTyping: (n) => `Start typing a Brand or Model above to search the ${n} vehicles in the database.`,
+    noResults: 'No vehicles match your search.',
+    resultsPage: (n,p,t) => `${n} results — Page ${p} of ${t}`,
+    dutyCalculator: 'Duty Calculator',
+    exchangeRates: 'Exchange Rates (RM per unit)',
+    shipLabel: 'Ship (RM)',
+    officialRates: 'Official rates updated every 2 weeks by Customs:',
+    dutyBracket: 'Duty Bracket (by engine size)',
+    aboveLabel: '& above',
+    emptyCalc: 'Click any vehicle in the table to calculate its import duty.',
+    fobFromDb: 'FOB from database',
+    overrideFob: 'Override FOB (optional)',
+    overridePlaceholder: 'Leave blank to use database value',
+    stepA: 'FOB × Exchange Rate', stepB: 'Insurance (A × 1.5%)', stepC: 'B + Shipping', stepD: 'T/S Value (A + C)',
+    stepE: (pct) => `Duty (D × ${pct})`,
+    breakdownTitle: 'Total Landed Cost Breakdown',
+    legendFob: 'Vehicle (FOB)', legendFees: 'Insurance & Shipping', legendDuty: 'Import Duty',
+    resultLabel: 'Estimated Import Duty',
+    printPdf: 'Print / PDF', copyResultBtn: 'Copy Result', copied: 'Copied ✓', clear: 'Clear',
+    shareLink: 'Share Link', linkCopied: 'Link Copied ✓', whatsapp: 'WhatsApp',
+    ev: 'Electric / EV', dutySuffix: 'duty',
+    faqTitle: 'Frequently Asked Questions',
+    faqItems: [
+      ['Is this an official calculation?', 'No. This tool gives an estimate based on the formula used by Malaysian Customs. The final duty amount is determined by the Royal Malaysian Customs Department (JKDM) upon inspection.'],
+      ['Where do the FOB values come from?', 'FOB (Free On Board) values are based on the official price guide issued by Customs for Japanese, UK, and Australian used vehicles.'],
+      ['What exchange rate should I use?', 'Use the official rate published by Customs (linked above), updated every 2 weeks. This calculator remembers your last entered rates for convenience.'],
+      ["What's not included in this estimate?", 'This covers import duty only. Excise duty (for applicable vehicles), sales tax, registration fees (JPJ), and road tax are calculated separately and not included here.'],
+      ['Can I override the FOB value?', "Yes — after selecting a vehicle, use the 'Override FOB' field if you have a different invoice value to calculate against."],
+      ["I can't find my vehicle model — what should I do?", "Try searching with just the brand name, or a shorter keyword from the model. If it's still not listed, contact our team directly for a manual estimate."],
+    ],
+    footerDisclaimer: 'Estimates only, for reference purposes. Exchange rates and duty calculations are based on figures you enter and may differ from the official assessment by the Royal Malaysian Customs Department.',
+    officialRatesLink: 'Official rates:',
+    compareTitle: 'Compare Vehicles',
+    compareEmpty: 'Tick up to 3 vehicles using the checkboxes in the table to compare them side by side.',
+    compareBarText: (n) => `${n} vehicle${n>1?'s':''} selected for comparison`,
+    compareView: 'View Comparison', compareClear: 'Clear', compareRemove: 'Remove',
+    compareLabels: { brand: 'Vehicle', cc: 'Engine', cur: 'Currency', fob: 'FOB', dutyPct: 'Duty Rate', dutyAmt: 'Estimated Duty', totalCost: 'Total Landed Cost' },
+    printTitle: 'Kansai Group — Import Duty Estimate',
+    printSub: (date) => `Generated ${date} · For reference only, subject to official customs assessment`,
+  },
+  bm: {
+    subtitle: 'Kalkulator Duti Import',
+    vehicleList: 'Senarai Kenderaan',
+    brand: 'Jenama',
+    modelKeywords: 'Model / Kata Kunci',
+    brandPlaceholder: 'cth. Toyota, Honda...',
+    modelPlaceholder: 'cth. Alphard, Land Cruiser...',
+    vehicleAge: 'Usia Kenderaan',
+    ageLabels: ['12 – 24 bulan','24 – 36 bulan','36 – 48 bulan','48 – 60 bulan','60+ bulan'],
+    currency: 'Mata Wang',
+    all: 'Semua',
+    ccRange: 'Julat CC',
+    allCC: 'Semua CC',
+    sortFob: 'Susun FOB',
+    default: 'Lalai',
+    fobLowHigh: 'FOB Rendah → Tinggi',
+    fobHighLow: 'FOB Tinggi → Rendah',
+    thNo: '#', thBrand: 'Jenama', thModel: 'Model', thCC: 'CC', thCur: 'Mata Wang', thFob: 'Nilai FOB', thCompare: 'Banding',
+    prev: '← Sebelum', next: 'Seterus →',
+    vehicles: 'kenderaan', totalLbl: 'jumlah',
+    startTyping: (n) => `Mula menaip Jenama atau Model di atas untuk mencari ${n} kenderaan dalam pangkalan data.`,
+    noResults: 'Tiada kenderaan sepadan dengan carian anda.',
+    resultsPage: (n,p,t) => `${n} keputusan — Halaman ${p} drpd ${t}`,
+    dutyCalculator: 'Kalkulator Duti',
+    exchangeRates: 'Kadar Tukaran (RM setiap unit)',
+    shipLabel: 'Penghantaran (RM)',
+    officialRates: 'Kadar rasmi dikemas kini setiap 2 minggu oleh Kastam:',
+    dutyBracket: 'Kategori Duti (mengikut saiz enjin)',
+    aboveLabel: '& ke atas',
+    emptyCalc: 'Klik mana-mana kenderaan dalam jadual untuk mengira duti import.',
+    fobFromDb: 'FOB daripada pangkalan data',
+    overrideFob: 'Ganti FOB (pilihan)',
+    overridePlaceholder: 'Biarkan kosong untuk guna nilai pangkalan data',
+    stepA: 'FOB × Kadar Tukaran', stepB: 'Insurans (A × 1.5%)', stepC: 'B + Penghantaran', stepD: 'Nilai T/S (A + C)',
+    stepE: (pct) => `Duti (D × ${pct})`,
+    breakdownTitle: 'Pecahan Jumlah Kos Mendarat',
+    legendFob: 'Kenderaan (FOB)', legendFees: 'Insurans & Penghantaran', legendDuty: 'Duti Import',
+    resultLabel: 'Anggaran Duti Import',
+    printPdf: 'Cetak / PDF', copyResultBtn: 'Salin Keputusan', copied: 'Disalin ✓', clear: 'Kosongkan',
+    shareLink: 'Kongsi Pautan', linkCopied: 'Pautan Disalin ✓', whatsapp: 'WhatsApp',
+    ev: 'Elektrik / EV', dutySuffix: 'duti',
+    faqTitle: 'Soalan Lazim',
+    faqItems: [
+      ['Adakah ini pengiraan rasmi?', 'Tidak. Alat ini memberikan anggaran berdasarkan formula yang digunakan oleh Kastam Malaysia. Jumlah duti muktamad ditentukan oleh Jabatan Kastam Diraja Malaysia (JKDM) semasa pemeriksaan.'],
+      ['Dari mana nilai FOB diperoleh?', 'Nilai FOB (Free On Board) adalah berdasarkan garis panduan harga rasmi yang dikeluarkan oleh Kastam untuk kenderaan terpakai dari Jepun, UK, dan Australia.'],
+      ['Kadar tukaran apa yang perlu saya guna?', 'Gunakan kadar rasmi yang diterbitkan oleh Kastam (pautan di atas), dikemas kini setiap 2 minggu. Kalkulator ini akan ingat kadar terakhir anda untuk kemudahan.'],
+      ['Apa yang tidak termasuk dalam anggaran ini?', 'Ini hanya meliputi duti import. Duti eksais (untuk kenderaan berkenaan), cukai jualan, yuran pendaftaran (JPJ), dan cukai jalan dikira berasingan dan tidak termasuk di sini.'],
+      ['Bolehkah saya menggantikan nilai FOB?', "Boleh — selepas memilih kenderaan, gunakan ruangan 'Ganti FOB' jika anda mempunyai nilai invois berbeza untuk dikira."],
+      ['Saya tidak jumpa model kenderaan saya — apa yang perlu saya buat?', 'Cuba cari dengan nama jenama sahaja, atau kata kunci lebih pendek daripada model. Jika masih tidak disenaraikan, hubungi pasukan kami terus untuk anggaran manual.'],
+    ],
+    footerDisclaimer: 'Hanya anggaran, untuk tujuan rujukan. Kadar tukaran dan pengiraan duti adalah berdasarkan nilai yang anda masukkan dan mungkin berbeza daripada penilaian rasmi oleh Jabatan Kastam Diraja Malaysia.',
+    officialRatesLink: 'Kadar rasmi:',
+    compareTitle: 'Banding Kenderaan',
+    compareEmpty: 'Tandakan sehingga 3 kenderaan menggunakan kotak semak dalam jadual untuk membandingkannya.',
+    compareBarText: (n) => `${n} kenderaan dipilih untuk perbandingan`,
+    compareView: 'Lihat Perbandingan', compareClear: 'Kosongkan', compareRemove: 'Buang',
+    compareLabels: { brand: 'Kenderaan', cc: 'Enjin', cur: 'Mata Wang', fob: 'FOB', dutyPct: 'Kadar Duti', dutyAmt: 'Anggaran Duti', totalCost: 'Jumlah Kos Mendarat' },
+    printTitle: 'Kansai Group — Anggaran Duti Import',
+    printSub: (date) => `Dijana ${date} · Untuk rujukan sahaja, tertakluk kepada penilaian rasmi kastam`,
+  },
+};
+
+function t(key) {
+  const v = (i18n[LANG] && i18n[LANG][key] !== undefined) ? i18n[LANG][key] : i18n.en[key];
+  return v;
+}
+
+function setLang(lang) {
+  LANG = lang;
+  try { localStorage.setItem('kansaiLang', lang); } catch(e) {}
+  rebuild();
+}
+
+function updateLangButtons() {
+  document.getElementById('langEN').classList.toggle('active', LANG === 'en');
+  document.getElementById('langBM').classList.toggle('active', LANG === 'bm');
+}
+
 // ═══════════════════════════════════════════════════
 // LOAD DATA, THEN BUILD PAGE
 // ═══════════════════════════════════════════════════
@@ -522,8 +719,11 @@ fetch('cars.json')
   .then(r => r.json())
   .then(data => {
     DB = data;
-    document.getElementById('totalCount').textContent = DB.length.toLocaleString() + ' vehicles';
+    const params = new URLSearchParams(location.search);
+    if (params.has('lang') && i18n[params.get('lang')]) LANG = params.get('lang');
+    document.getElementById('totalCount').textContent = DB.length.toLocaleString() + ' ' + t('vehicles');
     buildPage();
+    applySharedLink();
   })
   .catch(err => {
     document.getElementById('app').innerHTML =
@@ -535,6 +735,7 @@ fetch('cars.json')
 // BUILD PAGE HTML (after data is ready)
 // ═══════════════════════════════════════════════════
 function buildPage() {
+  const al = t('ageLabels');
   document.getElementById('app').innerHTML = `
   <div class="layout">
 
@@ -545,8 +746,8 @@ function buildPage() {
         <text x="50" y="63" text-anchor="middle" class="kg-text" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="34">KG</text>
       </svg>
       <div>
-        <div class="ph-title">Kansai Group — Import Duty Estimate</div>
-        <div class="ph-sub">Generated ${new Date().toLocaleDateString('en-MY', { day: 'numeric', month: 'long', year: 'numeric' })} · For reference only, subject to official customs assessment</div>
+        <div class="ph-title">${t('printTitle')}</div>
+        <div class="ph-sub">${t('printSub')(new Date().toLocaleDateString('en-MY', { day: 'numeric', month: 'long', year: 'numeric' }))}</div>
       </div>
     </div>
 
@@ -554,47 +755,47 @@ function buildPage() {
     <div>
       <div class="card">
         <div class="card-header">
-          <h2>Vehicle List</h2>
+          <h2>${t('vehicleList')}</h2>
           <span class="count" id="countBadge">—</span>
         </div>
 
         <div class="card-body">
           <div class="search-row">
             <div class="ac-wrap">
-              <label class="field-label">Brand</label>
-              <input type="text" id="sBrand" placeholder="e.g. Toyota, Honda..." autocomplete="off">
+              <label class="field-label">${t('brand')}</label>
+              <input type="text" id="sBrand" placeholder="${t('brandPlaceholder')}" autocomplete="off">
               <ul class="ac-list" id="brandList"></ul>
             </div>
             <div class="ac-wrap">
-              <label class="field-label">Model / Keywords</label>
-              <input type="text" id="sModel" placeholder="e.g. Alphard, Land Cruiser..." autocomplete="off">
+              <label class="field-label">${t('modelKeywords')}</label>
+              <input type="text" id="sModel" placeholder="${t('modelPlaceholder')}" autocomplete="off">
               <ul class="ac-list" id="modelList"></ul>
             </div>
           </div>
           <div class="search-row-4">
             <div>
-              <label class="field-label">Vehicle Age</label>
+              <label class="field-label">${t('vehicleAge')}</label>
               <select id="sAge">
-                <option value="0">12 – 24 months</option>
-                <option value="1">24 – 36 months</option>
-                <option value="2">36 – 48 months</option>
-                <option value="3">48 – 60 months</option>
-                <option value="4">60+ months</option>
+                <option value="0">${al[0]}</option>
+                <option value="1">${al[1]}</option>
+                <option value="2">${al[2]}</option>
+                <option value="3">${al[3]}</option>
+                <option value="4">${al[4]}</option>
               </select>
             </div>
             <div>
-              <label class="field-label">Currency</label>
+              <label class="field-label">${t('currency')}</label>
               <select id="sCur">
-                <option value="">All</option>
+                <option value="">${t('all')}</option>
                 <option value="JPY">JPY</option>
                 <option value="GBP">GBP</option>
                 <option value="AUD">AUD</option>
               </select>
             </div>
             <div>
-              <label class="field-label">CC Range</label>
+              <label class="field-label">${t('ccRange')}</label>
               <select id="sCC">
-                <option value="">All CC</option>
+                <option value="">${t('allCC')}</option>
                 <option value="0-1499">0 – 1499</option>
                 <option value="1500-1799">1500 – 1799</option>
                 <option value="1800-1999">1800 – 1999</option>
@@ -603,13 +804,22 @@ function buildPage() {
               </select>
             </div>
             <div>
-              <label class="field-label">Sort FOB</label>
+              <label class="field-label">${t('sortFob')}</label>
               <select id="sSort">
-                <option value="">Default</option>
-                <option value="asc">FOB Low → High</option>
-                <option value="desc">FOB High → Low</option>
+                <option value="">${t('default')}</option>
+                <option value="asc">${t('fobLowHigh')}</option>
+                <option value="desc">${t('fobHighLow')}</option>
               </select>
             </div>
+          </div>
+        </div>
+
+        <!-- Compare bar -->
+        <div class="compare-bar" id="compareBar" style="display:none">
+          <span id="compareBarText"></span>
+          <div style="display:flex; gap:8px">
+            <button class="pag-btn" onclick="toggleCompareView()" id="compareViewBtn">${t('compareView')}</button>
+            <button class="pag-btn" onclick="clearCompare()">${t('compareClear')}</button>
           </div>
         </div>
 
@@ -617,12 +827,13 @@ function buildPage() {
           <table>
             <thead>
               <tr>
-                <th>#</th>
-                <th>Brand</th>
-                <th>Model</th>
-                <th>CC</th>
-                <th>Cur</th>
-                <th>FOB Value</th>
+                <th>${t('thCompare')}</th>
+                <th>${t('thNo')}</th>
+                <th>${t('thBrand')}</th>
+                <th>${t('thModel')}</th>
+                <th>${t('thCC')}</th>
+                <th>${t('thCur')}</th>
+                <th>${t('thFob')}</th>
               </tr>
             </thead>
             <tbody id="tbody"></tbody>
@@ -632,21 +843,27 @@ function buildPage() {
         <div class="pagination">
           <span id="pgInfo" style="font-size:12px"></span>
           <div class="pag-btns">
-            <button class="pag-btn" id="prevBtn" onclick="goPage(pg-1)" disabled>← Prev</button>
+            <button class="pag-btn" id="prevBtn" onclick="goPage(pg-1)" disabled>${t('prev')}</button>
             <span id="pgNums" style="display:flex;gap:4px"></span>
-            <button class="pag-btn" id="nextBtn" onclick="goPage(pg+1)">Next →</button>
+            <button class="pag-btn" id="nextBtn" onclick="goPage(pg+1)">${t('next')}</button>
           </div>
         </div>
       </div>
     </div>
 
+    <!-- Compare view (hidden until vehicles are selected) -->
+    <div class="card" id="compareCard" style="display:none">
+      <div class="card-header"><h2>${t('compareTitle')}</h2></div>
+      <div class="card-body" id="compareBody"></div>
+    </div>
+
     <!-- Duty Calculator (full width, below the vehicle list) -->
     <div class="card">
-        <div class="card-header"><h2>Duty Calculator</h2></div>
+        <div class="card-header"><h2>${t('dutyCalculator')}</h2></div>
         <div class="card-body">
 
           <!-- Exchange rates -->
-          <label class="field-label">Exchange Rates (RM per unit)</label>
+          <label class="field-label">${t('exchangeRates')}</label>
           <div class="rate-row">
             <div>
               <label class="field-label">JPY</label>
@@ -661,24 +878,24 @@ function buildPage() {
               <input type="number" class="mono" id="rAUD" value="3.05" step="0.001" min="0">
             </div>
             <div>
-              <label class="field-label">Ship (RM)</label>
+              <label class="field-label">${t('shipLabel')}</label>
               <input type="number" class="mono" id="rShip" value="1800" step="100" min="0">
             </div>
           </div>
-          <div class="rate-link">Official rates updated every 2 weeks by Customs:
+          <div class="rate-link">${t('officialRates')}
             <a href="http://customsgc.gov.my/cgi-bin/exchange.cgi" target="_blank">customsgc.gov.my ↗</a>
           </div>
 
           <div class="divider"></div>
 
           <!-- Duty gauge -->
-          <div class="gauge-label">Duty Bracket (by engine size)</div>
+          <div class="gauge-label">${t('dutyBracket')}</div>
           <div class="duty-gauge">
             <div class="gauge-seg" id="dr0"><div class="g-cc">0–1,499cc<br>/ EV</div><div class="g-pct">135.95%</div></div>
             <div class="gauge-seg" id="dr1"><div class="g-cc">1,500–<br>1,799cc</div><div class="g-pct">150.25%</div></div>
             <div class="gauge-seg" id="dr2"><div class="g-cc">1,800–<br>1,999cc</div><div class="g-pct">157.40%</div></div>
             <div class="gauge-seg" id="dr3"><div class="g-cc">2,000–<br>2,499cc</div><div class="g-pct">171.70%</div></div>
-            <div class="gauge-seg" id="dr4"><div class="g-cc">2,500cc<br>&amp; above</div><div class="g-pct">193.15%</div></div>
+            <div class="gauge-seg" id="dr4"><div class="g-cc">2,500cc<br>${t('aboveLabel')}</div><div class="g-pct">193.15%</div></div>
           </div>
 
           <div class="divider"></div>
@@ -691,11 +908,27 @@ function buildPage() {
                 <circle cx="7.5" cy="17" r="0.5" fill="currentColor"/>
                 <circle cx="16.5" cy="17" r="0.5" fill="currentColor"/>
               </svg>
-              <p>Click any vehicle in the table to calculate its import duty.</p>
+              <p>${t('emptyCalc')}</p>
             </div>
           </div>
 
         </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="card faq-card">
+      <div class="card-header"><h2>${t('faqTitle')}</h2></div>
+      <div class="card-body faq-body">
+        ${t('faqItems').map((item, i) => `
+          <div class="faq-item">
+            <button class="faq-q" onclick="toggleFaq(${i})">
+              <span>${escapeHtml(item[0])}</span>
+              <span class="faq-icon" id="faqIcon${i}">+</span>
+            </button>
+            <div class="faq-a" id="faqA${i}">${escapeHtml(item[1])}</div>
+          </div>
+        `).join('')}
+      </div>
     </div>
   </div>
   `;
@@ -703,6 +936,8 @@ function buildPage() {
   initEvents();
   loadRates();
   showEmptyPrompt();
+  updateLangButtons();
+  refreshCompareBar();
 }
 
 // ═══════════════════════════════════════════════════
@@ -770,9 +1005,9 @@ function updateAcHl(listId, state) {
 
 function showEmptyPrompt() {
   filtered = [];
-  document.getElementById('countBadge').textContent = DB.length.toLocaleString() + ' total';
+  document.getElementById('countBadge').textContent = `${DB.length.toLocaleString()} ${t('totalLbl')}`;
   document.getElementById('tbody').innerHTML =
-    '<tr><td colspan="6" class="no-results">Start typing a Brand or Model above to search the ' + DB.length.toLocaleString() + ' vehicles in the database.</td></tr>';
+    `<tr><td colspan="7" class="no-results">${t('startTyping')(DB.length.toLocaleString())}</td></tr>`;
   document.getElementById('pgInfo').textContent = '';
   document.getElementById('pgNums').innerHTML = '';
   document.getElementById('prevBtn').disabled = true;
@@ -935,10 +1170,10 @@ function doFilter() {
 
 function renderTable() {
   const tbody = document.getElementById('tbody');
-  document.getElementById('countBadge').textContent = filtered.length.toLocaleString() + ' vehicles';
+  document.getElementById('countBadge').textContent = `${filtered.length.toLocaleString()} ${t('vehicles')}`;
 
   if (!filtered.length) {
-    tbody.innerHTML = '<tr><td colspan="6" class="no-results">No vehicles match your search.</td></tr>';
+    tbody.innerHTML = `<tr><td colspan="7" class="no-results">${t('noResults')}</td></tr>`;
     renderPagination();
     return;
   }
@@ -949,7 +1184,9 @@ function renderTable() {
   tbody.innerHTML = slice.map(c => {
     const fob = getFOB(c);
     const isActive = sel && sel[0] === c[0];
+    const isCompared = compareList.includes(c[0]);
     return `<tr class="${isActive ? 'active-row' : ''}" onclick="clickRow(${c[0]})">
+      <td class="td-check"><input type="checkbox" ${isCompared ? 'checked' : ''} onclick="event.stopPropagation(); toggleCompare(${c[0]})"></td>
       <td style="color:var(--ink-soft);font-size:11px;width:40px">${c[0]}</td>
       <td class="td-brand"><span class="brand-badge">${escapeHtml(c[1].slice(0,2))}</span>${escapeHtml(c[1])}</td>
       <td class="td-model" title="${escapeHtml(c[2])}">${escapeHtml(c[2])}</td>
@@ -964,7 +1201,7 @@ function renderTable() {
 
 function renderPagination() {
   const total = Math.ceil(filtered.length / PER_PAGE) || 1;
-  document.getElementById('pgInfo').textContent = `${filtered.length.toLocaleString()} results — Page ${pg} of ${total}`;
+  document.getElementById('pgInfo').textContent = t('resultsPage')(filtered.length.toLocaleString(), pg, total);
   document.getElementById('prevBtn').disabled = pg <= 1;
   document.getElementById('nextBtn').disabled = pg >= total;
 
@@ -980,6 +1217,115 @@ function goPage(n) {
   const total = Math.ceil(filtered.length / PER_PAGE);
   pg = Math.max(1, Math.min(total, n));
   renderTable();
+}
+
+// ═══════════════════════════════════════
+// COMPARE VEHICLES
+// ═══════════════════════════════════════
+function toggleCompare(no) {
+  const idx = compareList.indexOf(no);
+  if (idx >= 0) {
+    compareList.splice(idx, 1);
+  } else {
+    if (compareList.length >= 3) {
+      compareList.shift(); // drop oldest, keep max 3
+    }
+    compareList.push(no);
+  }
+  refreshCompareBar();
+  renderTable();
+  if (document.getElementById('compareCard').style.display !== 'none') renderCompare();
+}
+
+function refreshCompareBar() {
+  const bar = document.getElementById('compareBar');
+  if (!bar) return;
+  if (compareList.length === 0) {
+    bar.style.display = 'none';
+    document.getElementById('compareCard').style.display = 'none';
+    return;
+  }
+  bar.style.display = 'flex';
+  document.getElementById('compareBarText').textContent = t('compareBarText')(compareList.length);
+}
+
+function clearCompare() {
+  compareList = [];
+  document.getElementById('compareCard').style.display = 'none';
+  refreshCompareBar();
+  renderTable();
+}
+
+function toggleCompareView() {
+  const card = document.getElementById('compareCard');
+  if (card.style.display === 'none') {
+    renderCompare();
+    card.style.display = 'block';
+    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } else {
+    card.style.display = 'none';
+  }
+}
+
+function renderCompare() {
+  const cars = compareList.map(no => DB.find(c => c[0] === no)).filter(Boolean);
+  const body = document.getElementById('compareBody');
+  if (!cars.length) {
+    body.innerHTML = `<div class="compare-empty">${t('compareEmpty')}</div>`;
+    return;
+  }
+
+  const ship = parseFloat(document.getElementById('rShip').value) || 0;
+  const ageIdx = parseInt(document.getElementById('sAge').value);
+  const L = t('compareLabels');
+
+  const rows = cars.map(c => {
+    const [no, brand, model, cc, cur] = c;
+    const fob = getFOB(c);
+    const rate = getRate(cur);
+    const duty = getDuty(cc);
+    const A = fob * rate;
+    const B = A * 0.015;
+    const C = B + ship;
+    const D = A + C;
+    const E = D * duty.pct;
+    const total = D + E;
+    return { no, brand, model, cc, cur, fob, duty, E, total };
+  });
+
+  body.innerHTML = `
+  <div style="overflow-x:auto">
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th>${L.brand}</th>
+        ${rows.map(r => `<th>
+            <div class="compare-model">${escapeHtml(r.brand)}</div>
+            <div class="compare-sub">${escapeHtml(r.model)}</div>
+            <button class="compare-remove" onclick="toggleCompare(${r.no})">${t('compareRemove')}</button>
+          </th>`).join('')}
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="metric-label">${L.cc}</td>${rows.map(r => `<td>${r.cc === 0 ? 'EV' : r.cc.toLocaleString() + ' cc'}</td>`).join('')}</tr>
+      <tr><td class="metric-label">${L.cur}</td>${rows.map(r => `<td>${r.cur}</td>`).join('')}</tr>
+      <tr><td class="metric-label">${L.fob}</td>${rows.map(r => `<td class="mono">${r.fob.toLocaleString()} ${r.cur}</td>`).join('')}</tr>
+      <tr><td class="metric-label">${L.dutyPct}</td>${rows.map(r => `<td>${r.duty.lbl}</td>`).join('')}</tr>
+      <tr><td class="metric-label">${L.dutyAmt}</td>${rows.map(r => `<td class="compare-duty">${rm(r.E)}</td>`).join('')}</tr>
+      <tr><td class="metric-label">${L.totalCost}</td>${rows.map(r => `<td class="compare-total">${rm(r.total)}</td>`).join('')}</tr>
+    </tbody>
+  </table>
+  </div>`;
+}
+
+// ═══════════════════════════════════════
+// FAQ ACCORDION
+// ═══════════════════════════════════════
+function toggleFaq(i) {
+  const a = document.getElementById('faqA' + i);
+  const icon = document.getElementById('faqIcon' + i);
+  a.classList.toggle('open');
+  icon.classList.toggle('open');
 }
 
 // ═══════════════════════════════════════
@@ -1019,7 +1365,7 @@ function renderCalc() {
   });
   document.getElementById(duty.row).classList.add('active');
 
-  const ageLabels = ['12–24 months','24–36 months','36–48 months','48–60 months','60+ months'];
+  const ageLabels = t('ageLabels');
   const ageIdx = parseInt(document.getElementById('sAge').value);
   const ageLbl = ageLabels[ageIdx];
 
@@ -1028,18 +1374,18 @@ function renderCalc() {
       <div class="sel-brand">${escapeHtml(brand)}</div>
       <div class="sel-model">${escapeHtml(model)}</div>
       <div class="sel-tags">
-        <span class="tag">${cc === 0 ? 'Electric / EV' : cc.toLocaleString() + ' cc'}</span>
+        <span class="tag">${cc === 0 ? t('ev') : cc.toLocaleString() + ' cc'}</span>
         <span class="tag">${cur}</span>
         <span class="tag">${ageLbl}</span>
-        <span class="tag red">${duty.lbl} duty</span>
+        <span class="tag red">${duty.lbl} ${t('dutySuffix')}</span>
       </div>
     </div>
 
     <div style="margin-bottom:12px">
-      <label class="field-label">FOB from database (${cur})</label>
+      <label class="field-label">${t('fobFromDb')} (${cur})</label>
       <div class="fob-display">${fob.toLocaleString()} ${cur}</div>
-      <label class="field-label" style="margin-top:10px">Override FOB (optional)</label>
-      <input type="number" class="mono" id="ovFOB" placeholder="Leave blank to use database value"
+      <label class="field-label" style="margin-top:10px">${t('overrideFob')}</label>
+      <input type="number" class="mono" id="ovFOB" placeholder="${t('overridePlaceholder')}"
         min="0" step="1" style="margin-top:4px"
         value="${(!isNaN(ov) && ov > 0) ? ov : ''}">
     </div>
@@ -1048,7 +1394,7 @@ function renderCalc() {
       <div class="step">
         <div class="step-left">
           <span class="step-letter">A</span>
-          <span class="step-name">FOB × Exchange Rate</span>
+          <span class="step-name">${t('stepA')}</span>
           <div class="step-sub">${useFOB.toLocaleString()} ${cur} × ${rate.toFixed(4)}</div>
         </div>
         <div class="step-val">${rm(A)}</div>
@@ -1056,7 +1402,7 @@ function renderCalc() {
       <div class="step">
         <div class="step-left">
           <span class="step-letter">B</span>
-          <span class="step-name">Insurance (A × 1.5%)</span>
+          <span class="step-name">${t('stepB')}</span>
           <div class="step-sub">${rm(A)} × 1.5%</div>
         </div>
         <div class="step-val">${rm(B)}</div>
@@ -1064,7 +1410,7 @@ function renderCalc() {
       <div class="step">
         <div class="step-left">
           <span class="step-letter">C</span>
-          <span class="step-name">B + Shipping</span>
+          <span class="step-name">${t('stepC')}</span>
           <div class="step-sub">${rm(B)} + RM ${ship.toLocaleString()}</div>
         </div>
         <div class="step-val">${rm(C)}</div>
@@ -1072,7 +1418,7 @@ function renderCalc() {
       <div class="step">
         <div class="step-left">
           <span class="step-letter">D</span>
-          <span class="step-name">T/S Value (A + C)</span>
+          <span class="step-name">${t('stepD')}</span>
           <div class="step-sub">${rm(A)} + ${rm(C)}</div>
         </div>
         <div class="step-val big">${rm(D)}</div>
@@ -1080,7 +1426,7 @@ function renderCalc() {
       <div class="step">
         <div class="step-left">
           <span class="step-letter">E</span>
-          <span class="step-name">Duty (D × ${duty.lbl})</span>
+          <span class="step-name">${t('stepE')(duty.lbl)}</span>
           <div class="step-sub">${rm(D)} × ${duty.lbl}</div>
         </div>
         <div class="step-val big">${rm(E)}</div>
@@ -1088,29 +1434,31 @@ function renderCalc() {
     </div>
 
     <div class="breakdown">
-      <div class="breakdown-label">Total Landed Cost Breakdown</div>
+      <div class="breakdown-label">${t('breakdownTitle')}</div>
       <div class="breakdown-bar">
         <div class="breakdown-seg fob" style="flex-basis:${pctFob}%"></div>
         <div class="breakdown-seg fees" style="flex-basis:${pctFees}%"></div>
         <div class="breakdown-seg duty" style="flex-basis:${pctDuty}%"></div>
       </div>
       <div class="breakdown-legend">
-        <span><span class="dot fob"></span>Vehicle (FOB) — ${pctFob.toFixed(0)}%</span>
-        <span><span class="dot fees"></span>Insurance &amp; Shipping — ${pctFees.toFixed(0)}%</span>
-        <span><span class="dot duty"></span>Import Duty — ${pctDuty.toFixed(0)}%</span>
+        <span><span class="dot fob"></span>${t('legendFob')} — ${pctFob.toFixed(0)}%</span>
+        <span><span class="dot fees"></span>${t('legendFees')} — ${pctFees.toFixed(0)}%</span>
+        <span><span class="dot duty"></span>${t('legendDuty')} — ${pctDuty.toFixed(0)}%</span>
       </div>
     </div>
 
     <div class="result-box">
-      <div class="result-label">Estimated Import Duty</div>
+      <div class="result-label">${t('resultLabel')}</div>
       <div class="result-value">${rm(E)}</div>
       <div class="result-sub">${escapeHtml(brand)} · ${duty.lbl} · ${ageLbl}</div>
     </div>
 
     <div class="action-row">
-      <button class="btn btn-primary" onclick="window.print()">Print / PDF</button>
-      <button class="btn btn-ghost" id="copyBtn" onclick="copyResult(${bil})">Copy Result</button>
-      <button class="btn btn-ghost" onclick="clearSel()">Clear</button>
+      <button class="btn btn-primary" onclick="window.print()">${t('printPdf')}</button>
+      <button class="btn btn-ghost" id="copyBtn" onclick="copyResult(${bil})">${t('copyResultBtn')}</button>
+      <button class="btn btn-ghost" id="shareBtn" onclick="copyShareLink(${bil})">${t('shareLink')}</button>
+      <button class="btn btn-ghost" onclick="sendWhatsApp(${bil})">${t('whatsapp')}</button>
+      <button class="btn btn-ghost" onclick="clearSel()">${t('clear')}</button>
     </div>
   `;
 
@@ -1120,9 +1468,9 @@ function renderCalc() {
 // ═══════════════════════════════════════
 // COPY RESULT TO CLIPBOARD
 // ═══════════════════════════════════════
-function copyResult(bil) {
-  const car = DB.find(c => c[0] === bil);
-  if (!car) return;
+// SHARED CALCULATION HELPER
+// ═══════════════════════════════════════
+function computeCalc(car) {
   const [, brand, model, cc, cur] = car;
   const fob = getFOB(car);
   const rate = getRate(cur);
@@ -1131,37 +1479,45 @@ function copyResult(bil) {
   const ovEl = document.getElementById('ovFOB');
   const ov = ovEl ? parseFloat(ovEl.value) : NaN;
   const useFOB = (!isNaN(ov) && ov > 0) ? ov : fob;
-
   const A = useFOB * rate;
   const B = A * 0.015;
   const C = B + ship;
   const D = A + C;
   const E = D * duty.pct;
   const total = D + E;
+  return { brand, model, cc, cur, fob, rate, duty, ship, useFOB, A, B, C, D, E, total };
+}
 
-  const ageLabels = ['12–24 months','24–36 months','36–48 months','48–60 months','60+ months'];
-  const ageLbl = ageLabels[parseInt(document.getElementById('sAge').value)];
+// ═══════════════════════════════════════
+// COPY RESULT TO CLIPBOARD
+// ═══════════════════════════════════════
+function copyResult(bil) {
+  const car = DB.find(c => c[0] === bil);
+  if (!car) return;
+  const v = computeCalc(car);
+  const ageLbl = t('ageLabels')[parseInt(document.getElementById('sAge').value)];
+  const evLbl = v.cc === 0 ? t('ev') : v.cc.toLocaleString() + ' cc';
 
   const text =
-`Kansai Group — Import Duty Estimate
-${brand} ${model}
-${cc === 0 ? 'Electric / EV' : cc.toLocaleString() + ' cc'} · ${cur} · ${ageLbl}
+`${t('printTitle')}
+${v.brand} ${v.model}
+${evLbl} · ${v.cur} · ${ageLbl}
 
-FOB: ${useFOB.toLocaleString()} ${cur} (rate ${rate.toFixed(4)})
-Vehicle value (A): ${rm(A)}
-Insurance + Shipping (C): ${rm(C)}
-T/S Value (D): ${rm(D)}
-Duty rate: ${duty.lbl}
+FOB: ${v.useFOB.toLocaleString()} ${v.cur} (rate ${v.rate.toFixed(4)})
+${t('stepA')} (A): ${rm(v.A)}
+${t('stepC')} (C): ${rm(v.C)}
+${t('stepD')} (D): ${rm(v.D)}
+${t('dutySuffix')}: ${v.duty.lbl}
 
-ESTIMATED IMPORT DUTY: ${rm(E)}
-Total landed cost (D+E): ${rm(total)}
+${t('resultLabel').toUpperCase()}: ${rm(v.E)}
+${t('compareLabels').totalCost}: ${rm(v.total)}
 
-Estimate only — subject to official Customs assessment.`;
+${t('printSub')('').split('·')[1]?.trim() || ''}`;
 
   const btn = document.getElementById('copyBtn');
   const showCopied = () => {
     const original = btn.textContent;
-    btn.textContent = 'Copied ✓';
+    btn.textContent = t('copied');
     setTimeout(() => { btn.textContent = original; }, 1800);
   };
 
@@ -1170,6 +1526,54 @@ Estimate only — subject to official Customs assessment.`;
   } else {
     fallbackCopy(text, showCopied);
   }
+}
+
+// ═══════════════════════════════════════
+// SHARE LINK
+// ═══════════════════════════════════════
+function copyShareLink(bil) {
+  const params = new URLSearchParams();
+  params.set('car', bil);
+  params.set('age', document.getElementById('sAge').value);
+  params.set('jpy', document.getElementById('rJPY').value);
+  params.set('gbp', document.getElementById('rGBP').value);
+  params.set('aud', document.getElementById('rAUD').value);
+  params.set('ship', document.getElementById('rShip').value);
+  params.set('lang', LANG);
+  const url = `${location.origin}${location.pathname}?${params.toString()}`;
+
+  const btn = document.getElementById('shareBtn');
+  const showCopied = () => {
+    const original = btn.textContent;
+    btn.textContent = t('linkCopied');
+    setTimeout(() => { btn.textContent = original; }, 1800);
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(showCopied).catch(() => fallbackCopy(url, showCopied));
+  } else {
+    fallbackCopy(url, showCopied);
+  }
+}
+
+// ═══════════════════════════════════════
+// WHATSAPP ENQUIRY
+// ═══════════════════════════════════════
+function sendWhatsApp(bil) {
+  const car = DB.find(c => c[0] === bil);
+  if (!car) return;
+  const v = computeCalc(car);
+  const ageLbl = t('ageLabels')[parseInt(document.getElementById('sAge').value)];
+  const evLbl = v.cc === 0 ? t('ev') : v.cc.toLocaleString() + ' cc';
+
+  const text =
+`${t('printTitle')}
+${v.brand} ${v.model}
+${evLbl} · ${v.cur} · ${ageLbl}
+${t('resultLabel')}: ${rm(v.E)}
+${t('compareLabels').totalCost}: ${rm(v.total)}`;
+
+  window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
 }
 
 function fallbackCopy(text, cb) {
@@ -1193,9 +1597,69 @@ function clearSel() {
         <circle cx="7.5" cy="17" r="0.5" fill="currentColor"/>
         <circle cx="16.5" cy="17" r="0.5" fill="currentColor"/>
       </svg>
-      <p>Click any vehicle in the table to calculate its import duty.</p>
+      <p>${t('emptyCalc')}</p>
     </div>`;
   renderTable();
+}
+
+// ═══════════════════════════════════════
+// REBUILD (on language switch) — preserves search/selection state
+// ═══════════════════════════════════════
+function rebuild() {
+  const state = {
+    brand: document.getElementById('sBrand')?.value || '',
+    model: document.getElementById('sModel')?.value || '',
+    age: document.getElementById('sAge')?.value,
+    cur: document.getElementById('sCur')?.value,
+    cc: document.getElementById('sCC')?.value,
+    sort: document.getElementById('sSort')?.value,
+    jpy: document.getElementById('rJPY')?.value,
+    gbp: document.getElementById('rGBP')?.value,
+    aud: document.getElementById('rAUD')?.value,
+    ship: document.getElementById('rShip')?.value,
+  };
+  buildPage();
+  document.getElementById('sBrand').value = state.brand;
+  document.getElementById('sModel').value = state.model;
+  if (state.age  !== undefined) document.getElementById('sAge').value  = state.age;
+  if (state.cur  !== undefined) document.getElementById('sCur').value  = state.cur;
+  if (state.cc   !== undefined) document.getElementById('sCC').value   = state.cc;
+  if (state.sort !== undefined) document.getElementById('sSort').value = state.sort;
+  if (state.jpy)  document.getElementById('rJPY').value  = state.jpy;
+  if (state.gbp)  document.getElementById('rGBP').value  = state.gbp;
+  if (state.aud)  document.getElementById('rAUD').value  = state.aud;
+  if (state.ship) document.getElementById('rShip').value = state.ship;
+  syncBadge();
+  if (state.brand || state.model) doFilter();
+  if (sel) renderCalc();
+}
+
+// ═══════════════════════════════════════
+// SHARE LINK — apply params from URL on first load
+// ═══════════════════════════════════════
+function applySharedLink() {
+  const params = new URLSearchParams(location.search);
+  if (!params.has('car')) return;
+  const no = parseInt(params.get('car'), 10);
+  const car = DB.find(c => c[0] === no);
+  if (!car) return;
+
+  if (params.has('age'))  document.getElementById('sAge').value  = params.get('age');
+  if (params.has('jpy'))  document.getElementById('rJPY').value  = params.get('jpy');
+  if (params.has('gbp'))  document.getElementById('rGBP').value  = params.get('gbp');
+  if (params.has('aud'))  document.getElementById('rAUD').value  = params.get('aud');
+  if (params.has('ship')) document.getElementById('rShip').value = params.get('ship');
+  syncBadge();
+  saveRates();
+
+  document.getElementById('sBrand').value = car[1];
+  doFilter();
+  sel = car;
+  renderTable();
+  renderCalc();
+  setTimeout(() => {
+    document.getElementById('calcBody').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
 }
 </script>
 </body>
