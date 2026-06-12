@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kansai Group — Import Duty Calculator</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --border: #e2e5ea;
+  --border-strong: #c8cdd6;
+  --text: #1a1d23;
+  --text-mid: #4a5060;
+  --text-muted: #8a909e;
+  --blue: #2563eb;
+  --blue-light: #eff4ff;
+  --blue-mid: #dbeafe;
+  --green: #16a34a;
+  --green-light: #f0fdf4;
+  --red: #dc2626;
+  --amber: #d97706;
+  --amber-light: #fffbeb;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* ── HEADER ── */
+.header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.header-left { display: flex; align-items: center; gap: 12px; }
+.logo-box {
+  background: var(--blue);
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  letter-spacing: 0.3px;
+}
+.header-title { font-weight: 600; font-size: 15px; color: var(--text); }
+.header-sub { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+.header-right { display: flex; align-items: center; gap: 16px; font-size: 12px; color: var(--text-muted); }
+.rate-pill {
+  background: var(--blue-light);
+  color: var(--blue);
+  border: 1px solid var(--blue-mid);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+/* ── LAYOUT ── */
+.layout {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 20px 20px;
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 16px;
+}
+
+/* ── CARD ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.card-header {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.card-header h2 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.card-header .count {
+  font-size: 11px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+.card-body { padding: 16px 18px; }
+
+/* ── SEARCH BAR ── */
+.search-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.search-row-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; }
+
+label.field-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 5px;
+}
+
+input[type="text"], input[type="number"], select {
+  width: 100%;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 8px 11px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--surface);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+input:focus, select:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+}
+select { cursor: pointer; }
+
+/* ── AUTOCOMPLETE ── */
+.ac-wrap { position: relative; }
+.ac-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0; right: 0;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  max-height: 240px;
+  overflow-y: auto;
+  z-index: 300;
+  list-style: none;
+  padding: 4px 0;
+  display: none;
+}
+.ac-list.open { display: block; }
+.ac-item { padding: 8px 12px; font-size: 13px; cursor: pointer; }
+.ac-item:hover, .ac-item.hl { background: var(--blue-light); color: var(--blue); }
+.ac-empty { padding: 10px 12px; font-size: 12px; color: var(--text-muted); }
+
+/* ── TABLE ── */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+thead { position: sticky; top: 0; background: var(--bg); }
+th {
+  padding: 9px 14px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+tbody tr { cursor: pointer; transition: background 0.1s; }
+tbody tr:hover { background: var(--bg); }
+tbody tr.active-row { background: var(--blue-light) !important; }
+tbody tr.active-row td { border-bottom-color: var(--blue-mid); }
+.td-brand { font-weight: 600; font-size: 13px; white-space: nowrap; }
+.td-model { color: var(--text-mid); font-size: 12px; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.td-cc { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-mid); }
+.td-cur { display: inline-block; background: var(--bg); border: 1px solid var(--border); color: var(--text-mid); font-size: 11px; padding: 1px 6px; border-radius: 4px; font-weight: 600; }
+.td-fob { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; color: var(--text); }
+.no-results { text-align: center; padding: 40px; color: var(--text-muted); }
+
+/* ── PAGINATION ── */
+.pagination {
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.pag-btns { display: flex; gap: 4px; }
+.pag-btn {
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  padding: 4px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.1s;
+}
+.pag-btn:hover:not(:disabled) { background: var(--bg); border-color: var(--blue); color: var(--blue); }
+.pag-btn.cur { background: var(--blue); border-color: var(--blue); color: #fff; }
+.pag-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ── RIGHT COLUMN ── */
+.right-col { display: flex; flex-direction: column; gap: 14px; }
+
+/* ── RATE INPUTS ── */
+.rate-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.rate-link { font-size: 11px; color: var(--text-muted); margin-top: 8px; }
+.rate-link a { color: var(--blue); text-decoration: none; }
+.rate-link a:hover { text-decoration: underline; }
+
+/* ── DUTY TABLE ── */
+.duty-table { border: 1px solid var(--border); border-radius: 7px; overflow: hidden; }
+.duty-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.duty-row:last-child { border-bottom: none; }
+.duty-row.hl { background: var(--blue-light); }
+.duty-row.hl .dr-pct { color: var(--blue); font-weight: 700; }
+.dr-cc { color: var(--text-mid); }
+.dr-pct { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--text); }
+
+/* ── CALC PANEL ── */
+.sel-info {
+  background: var(--blue-light);
+  border: 1px solid var(--blue-mid);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+}
+.sel-brand { font-weight: 700; font-size: 14px; color: var(--text); }
+.sel-model { font-size: 12px; color: var(--text-mid); margin-top: 2px; line-height: 1.4; }
+.sel-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.tag {
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  color: var(--text-mid);
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+.tag.blue { background: var(--blue); border-color: var(--blue); color: #fff; }
+
+.fob-display {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-top: 5px;
+}
+
+.calc-steps { margin-top: 14px; }
+.step {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 10px;
+}
+.step:last-child { border-bottom: none; }
+.step-left { flex: 1; }
+.step-letter {
+  display: inline-block;
+  width: 20px; height: 20px;
+  border-radius: 4px;
+  background: var(--blue);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 20px;
+  margin-right: 6px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.step-name { font-weight: 500; font-size: 13px; color: var(--text); }
+.step-sub { font-size: 11px; color: var(--text-muted); margin-top: 1px; margin-left: 26px; }
+.step-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  text-align: right;
+}
+.step-val.big { font-size: 14px; color: var(--green); }
+
+/* ── RESULT BOX ── */
+.result-box {
+  background: var(--green-light);
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  margin-top: 14px;
+}
+.result-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--green); margin-bottom: 4px; }
+.result-value { font-family: 'JetBrains Mono', monospace; font-size: 26px; font-weight: 700; color: var(--green); }
+.result-sub { font-size: 11px; color: #4ade80; margin-top: 4px; }
+
+/* ── ACTIONS ── */
+.action-row { display: flex; gap: 8px; margin-top: 12px; }
+.btn {
+  flex: 1;
+  padding: 9px;
+  border-radius: 6px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s;
+}
+.btn-primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+.btn-primary:hover { background: #1d4ed8; }
+.btn-ghost { background: var(--surface); color: var(--text-mid); border-color: var(--border-strong); }
+.btn-ghost:hover { border-color: var(--text-muted); color: var(--text); }
+
+/* ── EMPTY STATE ── */
+.empty { text-align: center; padding: 28px 16px; color: var(--text-muted); }
+.empty .icon { font-size: 28px; margin-bottom: 8px; opacity: 0.5; }
+.empty p { font-size: 13px; line-height: 1.5; }
+
+/* ── LOADING ── */
+.loading-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* ── PRINT ── */
+@media print {
+  .header, .search-row, .search-row-4, .table-wrap, .pagination, .rate-grid, .rate-link, .action-row { display: none !important; }
+  .layout { grid-template-columns: 1fr; }
+  body { background: white; }
+}
+
+@media (max-width: 860px) {
+  .layout { grid-template-columns: 1fr; padding: 12px; }
+  .right-col { order: -1; }
+  .search-row-4 { grid-template-columns: 1fr 1fr; }
+  .header { padding: 0 14px; }
+  .header-right span:last-child { display: none; }
+}
+@media (max-width: 480px) {
+  .search-row, .search-row-4 { grid-template-columns: 1fr; }
+  .rate-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="logo-box">KANSAI</div>
+    <div>
+      <div class="header-title">Import Duty Calculator</div>
+      <div class="header-sub">Kansai Group · Malaysia</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span>JPY Rate: <span class="rate-pill" id="jpyBadge">0.0315</span></span>
+    <span id="totalCount" style="color:var(--text-muted)"></span>
+  </div>
+</div>
+
+<div id="app">
+  <div class="loading-screen">Loading vehicle database…</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════
+const PER_PAGE = 25;
+let DB = [];          // [no, brand, model, cc, currency, fob12, fob24, fob36, fob48, fob60]
+let filtered = [];
+let pg = 1;
+let sel = null;
+
+// ═══════════════════════════════════════════════════
+// LOAD DATA, THEN BUILD PAGE
+// ═══════════════════════════════════════════════════
+fetch('cars.json')
+  .then(r => r.json())
+  .then(data => {
+    DB = data;
+    document.getElementById('totalCount').textContent = DB.length.toLocaleString() + ' vehicles';
+    buildPage();
+  })
+  .catch(err => {
+    document.getElementById('app').innerHTML =
+      '<div class="loading-screen">Could not load cars.json — make sure it is uploaded in the same folder as index.html.</div>';
+    console.error(err);
+  });
+
+// ═══════════════════════════════════════════════════
+// BUILD PAGE HTML (after data is ready)
+// ═══════════════════════════════════════════════════
+function buildPage() {
+  document.getElementById('app').innerHTML = `
+  <div class="layout">
+
+    <!-- LEFT: Vehicle Table -->
+    <div>
+      <div class="card">
+        <div class="card-header">
+          <h2>Vehicle List</h2>
+          <span class="count" id="countBadge">—</span>
+        </div>
+
+        <div class="card-body">
+          <div class="search-row">
+            <div class="ac-wrap">
+              <label class="field-label">Brand</label>
+              <input type="text" id="sBrand" placeholder="e.g. Toyota, Honda..." autocomplete="off">
+              <ul class="ac-list" id="brandList"></ul>
+            </div>
+            <div class="ac-wrap">
+              <label class="field-label">Model / Keywords</label>
+              <input type="text" id="sModel" placeholder="e.g. Alphard, Land Cruiser..." autocomplete="off">
+              <ul class="ac-list" id="modelList"></ul>
+            </div>
+          </div>
+          <div class="search-row-4">
+            <div>
+              <label class="field-label">Vehicle Age</label>
+              <select id="sAge">
+                <option value="0">12 – 24 months</option>
+                <option value="1">24 – 36 months</option>
+                <option value="2">36 – 48 months</option>
+                <option value="3">48 – 60 months</option>
+                <option value="4">60+ months</option>
+              </select>
+            </div>
+            <div>
+              <label class="field-label">Currency</label>
+              <select id="sCur">
+                <option value="">All</option>
+                <option value="JPY">JPY</option>
+                <option value="GBP">GBP</option>
+                <option value="AUD">AUD</option>
+              </select>
+            </div>
+            <div>
+              <label class="field-label">CC Range</label>
+              <select id="sCC">
+                <option value="">All CC</option>
+                <option value="0-1499">0 – 1499</option>
+                <option value="1500-1799">1500 – 1799</option>
+                <option value="1800-1999">1800 – 1999</option>
+                <option value="2000-2499">2000 – 2499</option>
+                <option value="2500+">2500+</option>
+              </select>
+            </div>
+            <div>
+              <label class="field-label">Sort FOB</label>
+              <select id="sSort">
+                <option value="">Default</option>
+                <option value="asc">FOB Low → High</option>
+                <option value="desc">FOB High → Low</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Brand</th>
+                <th>Model</th>
+                <th>CC</th>
+                <th>Cur</th>
+                <th>FOB Value</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="pagination">
+          <span id="pgInfo" style="font-size:12px">—</span>
+          <div class="pag-btns">
+            <button class="pag-btn" id="prevBtn" onclick="goPage(pg-1)" disabled>← Prev</button>
+            <span id="pgNums" style="display:flex;gap:4px"></span>
+            <button class="pag-btn" id="nextBtn" onclick="goPage(pg+1)">Next →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Calculator -->
+    <div class="right-col">
+
+      <!-- Exchange Rates -->
+      <div class="card">
+        <div class="card-header"><h2>Exchange Rates (RM per unit)</h2></div>
+        <div class="card-body">
+          <div class="rate-grid">
+            <div>
+              <label class="field-label">JPY</label>
+              <input type="number" id="rJPY" value="0.0315" step="0.0001" min="0">
+            </div>
+            <div>
+              <label class="field-label">GBP</label>
+              <input type="number" id="rGBP" value="5.95" step="0.001" min="0">
+            </div>
+            <div>
+              <label class="field-label">AUD</label>
+              <input type="number" id="rAUD" value="3.05" step="0.001" min="0">
+            </div>
+            <div>
+              <label class="field-label">Shipping (RM)</label>
+              <input type="number" id="rShip" value="1800" step="100" min="0">
+            </div>
+          </div>
+          <div class="rate-link">Official rates updated every 2 weeks by Customs:
+            <a href="http://customsgc.gov.my/cgi-bin/exchange.cgi" target="_blank">customsgc.gov.my ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Duty Rate Reference -->
+      <div class="card">
+        <div class="card-header"><h2>Duty Rate Reference (CC)</h2></div>
+        <div class="card-body" style="padding:10px 18px">
+          <div class="duty-table">
+            <div class="duty-row" id="dr0"><span class="dr-cc">0 – 1,499 cc / EV</span><span class="dr-pct">135.95%</span></div>
+            <div class="duty-row" id="dr1"><span class="dr-cc">1,500 – 1,799 cc</span><span class="dr-pct">150.25%</span></div>
+            <div class="duty-row" id="dr2"><span class="dr-cc">1,800 – 1,999 cc</span><span class="dr-pct">157.40%</span></div>
+            <div class="duty-row" id="dr3"><span class="dr-cc">2,000 – 2,499 cc</span><span class="dr-pct">171.70%</span></div>
+            <div class="duty-row" id="dr4"><span class="dr-cc">2,500+ cc</span><span class="dr-pct">193.15%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Calculation Result -->
+      <div class="card">
+        <div class="card-header"><h2>Duty Calculation</h2></div>
+        <div class="card-body" id="calcBody">
+          <div class="empty">
+            <div class="icon">🚗</div>
+            <p>Click any vehicle in the table to calculate its import duty.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  `;
+
+  initEvents();
+  doFilter();
+}
+
+// ═══════════════════════════════════════════════════
+// EVENT BINDING
+// ═══════════════════════════════════════════════════
+function initEvents() {
+  document.getElementById('sBrand').addEventListener('input', () => { onBrandInput(); doFilter(); });
+  document.getElementById('sModel').addEventListener('input', () => { onModelInput(); doFilter(); });
+  document.getElementById('sCur').addEventListener('change', doFilter);
+  document.getElementById('sCC').addEventListener('change', doFilter);
+  document.getElementById('sSort').addEventListener('change', doFilter);
+  document.getElementById('sAge').addEventListener('change', () => { doFilter(); if (sel) renderCalc(); });
+
+  document.getElementById('rJPY').addEventListener('input', () => { syncBadge(); if (sel) renderCalc(); });
+  document.getElementById('rGBP').addEventListener('input', () => { if (sel) renderCalc(); });
+  document.getElementById('rAUD').addEventListener('input', () => { if (sel) renderCalc(); });
+  document.getElementById('rShip').addEventListener('input', () => { if (sel) renderCalc(); });
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.ac-wrap')) {
+      document.getElementById('brandList').classList.remove('open');
+      document.getElementById('modelList').classList.remove('open');
+    }
+  });
+
+  document.getElementById('sBrand').addEventListener('focus', onBrandInput);
+  document.getElementById('sModel').addEventListener('focus', onModelInput);
+}
+
+// ═══════════════════════════════════════════════════
+// AUTOCOMPLETE
+// ═══════════════════════════════════════════════════
+function onBrandInput() {
+  const val = document.getElementById('sBrand').value.toLowerCase().trim();
+  const all = [...new Set(DB.map(c => c[1]))].sort();
+  const matches = val ? all.filter(b => b.toLowerCase().includes(val)) : all;
+  renderAcList('brandList', matches, (picked) => {
+    document.getElementById('sBrand').value = picked;
+    document.getElementById('sModel').value = '';
+    document.getElementById('brandList').classList.remove('open');
+    doFilter();
+  });
+}
+
+function onModelInput() {
+  const brandVal = document.getElementById('sBrand').value.toLowerCase().trim();
+  const val = document.getElementById('sModel').value.toLowerCase().trim();
+  let pool = DB;
+  if (brandVal) pool = pool.filter(c => c[1].toLowerCase() === brandVal);
+  const all = [...new Set(pool.map(c => c[2]))].sort();
+  const matches = val ? all.filter(m => m.toLowerCase().includes(val)) : all;
+  renderAcList('modelList', matches, (picked) => {
+    document.getElementById('sModel').value = picked;
+    document.getElementById('modelList').classList.remove('open');
+    doFilter();
+  });
+}
+
+function renderAcList(listId, items, onPick) {
+  const ul = document.getElementById(listId);
+  if (!items.length) {
+    ul.innerHTML = '<li class="ac-empty">No matches</li>';
+  } else {
+    ul.innerHTML = items.slice(0, 100).map(item =>
+      `<li class="ac-item">${escapeHtml(item)}</li>`
+    ).join('');
+    [...ul.children].forEach((li, i) => {
+      li.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        onPick(items[i]);
+      });
+    });
+  }
+  ul.classList.add('open');
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ═══════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════
+function getRate(cur) {
+  const m = { JPY: 'rJPY', GBP: 'rGBP', AUD: 'rAUD' };
+  const el = document.getElementById(m[cur] || 'rJPY');
+  return el ? (parseFloat(el.value) || 0) : 0;
+}
+
+function getDuty(cc) {
+  if (cc === 0)    return { pct: 1.3595, lbl: '135.95%', row: 'dr0' }; // EV
+  if (cc <= 1499)  return { pct: 1.3595, lbl: '135.95%', row: 'dr0' };
+  if (cc <= 1799)  return { pct: 1.5025, lbl: '150.25%', row: 'dr1' };
+  if (cc <= 1999)  return { pct: 1.5740, lbl: '157.40%', row: 'dr2' };
+  if (cc <= 2499)  return { pct: 1.7170, lbl: '171.70%', row: 'dr3' };
+  return           { pct: 1.9315, lbl: '193.15%', row: 'dr4' };
+}
+
+function getFOB(car) {
+  const idx = parseInt(document.getElementById('sAge').value);
+  return car[5 + idx];
+}
+
+function getCCBucket(cc) {
+  if (cc === 0 || cc <= 1499) return '0-1499';
+  if (cc <= 1799) return '1500-1799';
+  if (cc <= 1999) return '1800-1999';
+  if (cc <= 2499) return '2000-2499';
+  return '2500+';
+}
+
+function rm(n) {
+  return 'RM ' + n.toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function syncBadge() {
+  const v = parseFloat(document.getElementById('rJPY').value) || 0;
+  document.getElementById('jpyBadge').textContent = v.toFixed(4);
+}
+
+// ═══════════════════════════════════════
+// FILTER + RENDER TABLE
+// ═══════════════════════════════════════
+function doFilter() {
+  const brand = document.getElementById('sBrand').value.toLowerCase().trim();
+  const model = document.getElementById('sModel').value.toLowerCase().trim();
+  const cur   = document.getElementById('sCur').value;
+  const ccB   = document.getElementById('sCC').value;
+  const sort  = document.getElementById('sSort').value;
+
+  filtered = DB.filter(c => {
+    if (brand && !c[1].toLowerCase().includes(brand)) return false;
+    if (model && !c[2].toLowerCase().includes(model)) return false;
+    if (cur && c[4] !== cur) return false;
+    if (ccB && getCCBucket(c[3]) !== ccB) return false;
+    return true;
+  });
+
+  if (sort === 'asc')  filtered.sort((a,b) => getFOB(a) - getFOB(b));
+  if (sort === 'desc') filtered.sort((a,b) => getFOB(b) - getFOB(a));
+
+  pg = 1;
+  renderTable();
+}
+
+function renderTable() {
+  const tbody = document.getElementById('tbody');
+  document.getElementById('countBadge').textContent = filtered.length.toLocaleString() + ' vehicles';
+
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="no-results">No vehicles match your search.</td></tr>';
+    renderPagination();
+    return;
+  }
+
+  const start = (pg - 1) * PER_PAGE;
+  const slice = filtered.slice(start, start + PER_PAGE);
+
+  tbody.innerHTML = slice.map(c => {
+    const fob = getFOB(c);
+    const isActive = sel && sel[0] === c[0];
+    return `<tr class="${isActive ? 'active-row' : ''}" onclick="clickRow(${c[0]})">
+      <td style="color:var(--text-muted);font-size:11px;width:40px">${c[0]}</td>
+      <td class="td-brand">${escapeHtml(c[1])}</td>
+      <td class="td-model" title="${escapeHtml(c[2])}">${escapeHtml(c[2])}</td>
+      <td class="td-cc">${c[3] === 0 ? 'EV' : c[3].toLocaleString()}</td>
+      <td><span class="td-cur">${c[4]}</span></td>
+      <td class="td-fob">${fob.toLocaleString()}</td>
+    </tr>`;
+  }).join('');
+
+  renderPagination();
+}
+
+function renderPagination() {
+  const total = Math.ceil(filtered.length / PER_PAGE) || 1;
+  document.getElementById('pgInfo').textContent = `${filtered.length.toLocaleString()} results — Page ${pg} of ${total}`;
+  document.getElementById('prevBtn').disabled = pg <= 1;
+  document.getElementById('nextBtn').disabled = pg >= total;
+
+  let nums = '';
+  const range = 2;
+  for (let i = Math.max(1, pg - range); i <= Math.min(total, pg + range); i++) {
+    nums += `<button class="pag-btn ${i===pg?'cur':''}" onclick="goPage(${i})">${i}</button>`;
+  }
+  document.getElementById('pgNums').innerHTML = nums;
+}
+
+function goPage(n) {
+  const total = Math.ceil(filtered.length / PER_PAGE);
+  pg = Math.max(1, Math.min(total, n));
+  renderTable();
+}
+
+// ═══════════════════════════════════════
+// SELECT & CALCULATE
+// ═══════════════════════════════════════
+function clickRow(bil) {
+  sel = DB.find(c => c[0] === bil) || null;
+  renderTable();
+  if (sel) renderCalc();
+}
+
+function renderCalc() {
+  if (!sel) return;
+
+  const [bil, brand, model, cc, cur] = sel;
+  const fob = getFOB(sel);
+  const rate = getRate(cur);
+  const duty = getDuty(cc);
+  const ship = parseFloat(document.getElementById('rShip').value) || 0;
+
+  const ovEl = document.getElementById('ovFOB');
+  const ov = ovEl ? parseFloat(ovEl.value) : NaN;
+  const useFOB = (!isNaN(ov) && ov > 0) ? ov : fob;
+
+  const A = useFOB * rate;
+  const B = A * 0.015;
+  const C = B + ship;
+  const D = A + C;
+  const E = D * duty.pct;
+
+  ['dr0','dr1','dr2','dr3','dr4'].forEach(id => {
+    document.getElementById(id).classList.remove('hl');
+  });
+  document.getElementById(duty.row).classList.add('hl');
+
+  const ageLabels = ['12–24 months','24–36 months','36–48 months','48–60 months','60+ months'];
+  const ageIdx = parseInt(document.getElementById('sAge').value);
+  const ageLbl = ageLabels[ageIdx];
+
+  document.getElementById('calcBody').innerHTML = `
+    <div class="sel-info">
+      <div class="sel-brand">${escapeHtml(brand)}</div>
+      <div class="sel-model">${escapeHtml(model)}</div>
+      <div class="sel-tags">
+        <span class="tag">${cc === 0 ? 'Electric / EV' : cc.toLocaleString() + ' cc'}</span>
+        <span class="tag">${cur}</span>
+        <span class="tag">${ageLbl}</span>
+        <span class="tag blue">${duty.lbl} duty</span>
+      </div>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <label class="field-label">FOB from database (${cur})</label>
+      <div class="fob-display">${fob.toLocaleString()} ${cur}</div>
+      <label class="field-label" style="margin-top:10px">Override FOB (optional)</label>
+      <input type="number" id="ovFOB" placeholder="Leave blank to use database value"
+        min="0" step="1" style="margin-top:4px"
+        value="${(!isNaN(ov) && ov > 0) ? ov : ''}">
+    </div>
+
+    <div class="calc-steps">
+      <div class="step">
+        <div class="step-left">
+          <span class="step-letter">A</span>
+          <span class="step-name">FOB × Exchange Rate</span>
+          <div class="step-sub">${useFOB.toLocaleString()} ${cur} × ${rate.toFixed(4)}</div>
+        </div>
+        <div class="step-val">${rm(A)}</div>
+      </div>
+      <div class="step">
+        <div class="step-left">
+          <span class="step-letter">B</span>
+          <span class="step-name">Insurance (A × 1.5%)</span>
+          <div class="step-sub">${rm(A)} × 1.5%</div>
+        </div>
+        <div class="step-val">${rm(B)}</div>
+      </div>
+      <div class="step">
+        <div class="step-left">
+          <span class="step-letter">C</span>
+          <span class="step-name">B + Shipping</span>
+          <div class="step-sub">${rm(B)} + RM ${ship.toLocaleString()}</div>
+        </div>
+        <div class="step-val">${rm(C)}</div>
+      </div>
+      <div class="step">
+        <div class="step-left">
+          <span class="step-letter">D</span>
+          <span class="step-name">T/S Value (A + C)</span>
+          <div class="step-sub">${rm(A)} + ${rm(C)}</div>
+        </div>
+        <div class="step-val big">${rm(D)}</div>
+      </div>
+      <div class="step">
+        <div class="step-left">
+          <span class="step-letter">E</span>
+          <span class="step-name">Duty (D × ${duty.lbl})</span>
+          <div class="step-sub">${rm(D)} × ${duty.lbl}</div>
+        </div>
+        <div class="step-val big">${rm(E)}</div>
+      </div>
+    </div>
+
+    <div class="result-box">
+      <div class="result-label">Estimated Import Duty</div>
+      <div class="result-value">${rm(E)}</div>
+      <div class="result-sub">${escapeHtml(brand)} · ${duty.lbl} · ${ageLbl}</div>
+    </div>
+
+    <div class="action-row">
+      <button class="btn btn-primary" onclick="window.print()">Print / PDF</button>
+      <button class="btn btn-ghost" onclick="clearSel()">Clear</button>
+    </div>
+  `;
+
+  document.getElementById('ovFOB').addEventListener('input', renderCalc);
+}
+
+function clearSel() {
+  sel = null;
+  ['dr0','dr1','dr2','dr3','dr4'].forEach(id => document.getElementById(id).classList.remove('hl'));
+  document.getElementById('calcBody').innerHTML = `
+    <div class="empty">
+      <div class="icon">🚗</div>
+      <p>Click any vehicle in the table to calculate its import duty.</p>
+    </div>`;
+  renderTable();
+}
+</script>
+</body>
+</html>
