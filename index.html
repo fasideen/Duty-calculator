@@ -1335,7 +1335,12 @@ function toggleFaq(i) {
 function clickRow(bil) {
   sel = DB.find(c => c[0] === bil) || null;
   renderTable();
-  if (sel) renderCalc();
+  if (sel) {
+    renderCalc();
+    setTimeout(() => {
+      document.getElementById('calcBody').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  }
 }
 
 function renderCalc() {
