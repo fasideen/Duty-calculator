@@ -5,28 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kansai Group — Import Duty Calculator</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  /* ── 3-colour core palette ── */
-  --bg:      #F5F6F9;   /* cool off-white */
+  /* ── 2-colour core: navy + red, on cool neutrals ── */
+  --bg:      #F4F5F8;
   --surface: #FFFFFF;
-  --ink:     #1C2030;   /* near-black navy — primary text/headers */
-  --ink-mid: #5C6478;
-  --ink-soft:#9AA2B4;
-  --border:  #E7E9F0;
-  --red:     #E0303D;   /* Kansai red — accent / actions */
-  --red-light: #FDECEE;
-  --red-dark:  #C2202D;
-  --gold:      #C9A227;  /* third accent — highlights / selections */
-  --gold-light:#FBF3D9;
-  --gold-dark: #97791C;
-  /* result green is semantic, not part of the core 3 */
+  --ink:     #14182A;   /* near-black navy — primary text/headers */
+  --ink-mid: #58607A;
+  --ink-soft:#9AA2B8;
+  --border:  #E6E8F0;
+  --red:     #DC2626;   /* Kansai red — accent / actions / selection */
+  --red-light: #FDECEC;
+  --red-dark:  #B91C1C;
+  --gold:    #D4AF37;   /* brand accent — used sparingly */
+  /* result green is semantic, not part of the core 2 */
   --green:      #16A34A;
   --green-bg:   #E9FBF1;
   --green-text: #0F7A38;
+  --shadow: 0 1px 2px rgba(20,24,42,0.04), 0 4px 16px rgba(20,24,42,0.04);
 }
 
 body {
@@ -40,34 +39,37 @@ body {
 }
 
 h1, h2, h3, .display { font-family: 'Space Grotesk', sans-serif; }
+.brand-font { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.04em; }
 
 /* ── HEADER ── */
 .header {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  background: linear-gradient(135deg, #1B2038 0%, var(--ink) 60%);
   padding: 0 24px;
-  height: 64px;
+  height: 68px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   position: sticky;
   top: 0;
   z-index: 50;
+  border-bottom: 3px solid var(--red);
+  box-shadow: inset 0 -3px 0 var(--gold);
 }
-.header-left { display: flex; align-items: center; gap: 12px; }
+.header-left { display: flex; align-items: center; gap: 14px; }
 .logo-mark {
-  width: 40px; height: 40px;
+  width: 42px; height: 42px;
   display: grid;
   place-items: center;
   flex-shrink: 0;
 }
 .kg-hex { fill: var(--red); }
 .kg-text { fill: #fff; }
-.header-title { font-weight: 700; font-size: 16px; color: var(--ink); letter-spacing: -0.01em; }
-.header-sub { font-size: 12px; color: var(--ink-soft); margin-top: 1px; }
+.header-title { font-weight: 700; font-size: 19px; color: #fff; }
+.header-sub { font-size: 12px; color: rgba(255,255,255,0.55); margin-top: 2px; font-family: 'Inter', sans-serif; text-transform: none; letter-spacing: 0; }
 .header-right { display: flex; align-items: center; gap: 14px; }
 .rate-pill {
-  background: var(--ink);
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
   color: #fff;
   border-radius: 20px;
   padding: 5px 12px;
@@ -79,7 +81,7 @@ h1, h2, h3, .display { font-family: 'Space Grotesk', sans-serif; }
   gap: 6px;
 }
 .rate-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red); }
-.header-count { font-size: 12px; color: var(--ink-soft); font-weight: 500; }
+.header-count { font-size: 12px; color: rgba(255,255,255,0.55); font-weight: 500; font-family: 'Inter', sans-serif; text-transform: none; letter-spacing: 0; }
 
 /* ── LAYOUT ── */
 .layout {
@@ -97,6 +99,7 @@ h1, h2, h3, .display { font-family: 'Space Grotesk', sans-serif; }
   border: 1px solid var(--border);
   border-radius: 14px;
   overflow: hidden;
+  box-shadow: var(--shadow);
 }
 .card-header {
   padding: 14px 20px;
@@ -105,7 +108,7 @@ h1, h2, h3, .display { font-family: 'Space Grotesk', sans-serif; }
   align-items: center;
   justify-content: space-between;
 }
-.card-header h2 { font-size: 14px; font-weight: 600; color: var(--ink); }
+.card-header h2 { font-size: 16px; font-weight: 600; color: var(--ink); font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.05em; }
 .card-header .count {
   font-size: 11px;
   background: var(--bg);
@@ -170,7 +173,7 @@ input.mono, .mono { font-family: 'JetBrains Mono', monospace; }
 }
 .ac-list.open { display: block; }
 .ac-item { padding: 8px 10px; font-size: 13px; cursor: pointer; border-radius: 7px; }
-.ac-item:hover, .ac-item.hl { background: var(--gold-light); color: var(--gold-dark); }
+.ac-item:hover, .ac-item.hl { background: var(--red-light); color: var(--red-dark); }
 .ac-empty { padding: 10px 12px; font-size: 12px; color: var(--ink-soft); }
 
 /* ── TABLE ── */
@@ -194,10 +197,24 @@ td {
   vertical-align: middle;
 }
 tbody tr { cursor: pointer; transition: background 0.1s; }
+tbody tr:nth-child(even) { background: #FAFBFC; }
 tbody tr:hover { background: var(--bg); }
-tbody tr.active-row { background: var(--gold-light) !important; }
-tbody tr.active-row td { border-bottom-color: #F0E2B3; }
-.td-brand { font-weight: 700; font-size: 13px; white-space: nowrap; color: var(--ink); }
+tbody tr.active-row { background: var(--red-light) !important; }
+tbody tr.active-row td { border-bottom-color: #FBD5D5; }
+.td-brand { font-weight: 700; font-size: 13px; white-space: nowrap; color: var(--ink); display: flex; align-items: center; gap: 9px; }
+.brand-badge {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #fff;
+  font-family: 'Oswald', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
 .td-model { color: var(--ink-mid); font-size: 12px; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .td-cc { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-mid); }
 .td-cur {
@@ -248,25 +265,30 @@ tbody tr.active-row td { border-bottom-color: #F0E2B3; }
 
 /* ── DUTY GAUGE ── */
 .gauge-label { font-size: 11px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
-.duty-gauge { display: flex; gap: 4px; }
+.duty-gauge {
+  display: flex;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1.5px solid var(--border);
+}
 .gauge-seg {
   flex: 1;
   background: var(--bg);
-  border: 1.5px solid var(--border);
-  border-radius: 8px;
-  padding: 8px 4px;
+  padding: 10px 4px;
   text-align: center;
+  border-right: 1.5px solid var(--border);
   transition: all 0.15s;
 }
-.gauge-seg .g-cc { font-size: 9px; color: var(--ink-soft); font-weight: 600; line-height: 1.3; }
-.gauge-seg .g-pct { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: var(--ink-mid); margin-top: 2px; }
-.gauge-seg.active { background: var(--ink); border-color: var(--ink); transform: translateY(-2px); }
-.gauge-seg.active .g-cc { color: rgba(255,255,255,.65); }
-.gauge-seg.active .g-pct { color: var(--red); }
+.gauge-seg:last-child { border-right: none; }
+.gauge-seg .g-cc { font-size: 10px; color: var(--ink-mid); font-weight: 600; line-height: 1.3; }
+.gauge-seg .g-pct { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: var(--ink); margin-top: 3px; }
+.gauge-seg.active { background: var(--red); border-right-color: var(--red); }
+.gauge-seg.active .g-cc { color: rgba(255,255,255,.75); }
+.gauge-seg.active .g-pct { color: #fff; }
 
 /* ── CALC PANEL ── */
 .sel-info { margin-bottom: 14px; }
-.sel-brand { font-weight: 700; font-size: 16px; color: var(--ink); font-family: 'Space Grotesk', sans-serif; }
+.sel-brand { font-weight: 700; font-size: 19px; color: var(--ink); font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.04em; }
 .sel-model { font-size: 12px; color: var(--ink-mid); margin-top: 3px; line-height: 1.4; }
 .sel-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
 .tag {
@@ -283,7 +305,6 @@ tbody tr.active-row td { border-bottom-color: #F0E2B3; }
 .fob-display {
   background: var(--bg);
   border: 1.5px solid var(--border);
-  border-left: 4px solid var(--gold);
   border-radius: 9px;
   padding: 10px 12px;
   font-family: 'JetBrains Mono', monospace;
@@ -329,18 +350,40 @@ tbody tr.active-row td { border-bottom-color: #F0E2B3; }
 }
 .step-val.big { font-size: 15px; color: var(--red); }
 
+/* ── COST BREAKDOWN ── */
+.breakdown { margin-top: 18px; }
+.breakdown-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-soft); margin-bottom: 9px; font-family: 'Oswald', sans-serif; }
+.breakdown-bar { display: flex; height: 12px; border-radius: 6px; overflow: hidden; }
+.breakdown-seg { transition: flex-basis 0.3s ease; }
+.breakdown-seg.fob  { background: var(--ink); }
+.breakdown-seg.fees { background: var(--ink-soft); }
+.breakdown-seg.duty { background: var(--red); }
+.breakdown-legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 10px; font-size: 11px; color: var(--ink-mid); }
+.breakdown-legend .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
+.breakdown-legend .dot.fob  { background: var(--ink); }
+.breakdown-legend .dot.fees { background: var(--ink-soft); }
+.breakdown-legend .dot.duty { background: var(--red); }
+
 /* ── RESULT BOX ── */
 .result-box {
   background: var(--green-bg);
   border: 1.5px solid #BBF0CF;
+  border-top: 4px solid var(--gold);
   border-radius: 12px;
-  padding: 18px;
+  padding: 22px;
   text-align: center;
-  margin-top: 14px;
+  margin-top: 16px;
 }
-.result-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--green-text); margin-bottom: 5px; }
-.result-value { font-family: 'JetBrains Mono', monospace; font-size: 28px; font-weight: 700; color: var(--green); }
-.result-sub { font-size: 12px; color: var(--green-text); margin-top: 5px; font-weight: 500; }
+.result-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--green-text); margin-bottom: 6px; font-family: 'Oswald', sans-serif; }
+.result-value { font-family: 'JetBrains Mono', monospace; font-size: 34px; font-weight: 700; color: var(--green); letter-spacing: -0.01em; }
+.result-sub { font-size: 12px; color: var(--green-text); margin-top: 6px; font-weight: 500; }
+
+/* ── FADE-IN ── */
+@keyframes calcFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+#calcBody > * { animation: calcFadeIn 0.35s ease-out; }
 
 /* ── ACTIONS ── */
 .action-row { display: flex; gap: 10px; margin-top: 14px; }
@@ -355,10 +398,10 @@ tbody tr.active-row td { border-bottom-color: #F0E2B3; }
   border: 1.5px solid transparent;
   transition: all 0.15s;
 }
-.btn-primary { background: var(--red); color: #fff; border-color: var(--red); }
-.btn-primary:hover { background: var(--red-dark); border-color: var(--red-dark); }
+.btn-primary { background: var(--red); color: #fff; border-color: var(--red); box-shadow: 0 2px 8px rgba(220,38,38,0.25); }
+.btn-primary:hover { background: var(--red-dark); border-color: var(--red-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(220,38,38,0.3); }
 .btn-ghost { background: var(--surface); color: var(--ink-mid); border-color: var(--border); }
-.btn-ghost:hover { border-color: var(--ink-soft); color: var(--ink); }
+.btn-ghost:hover { border-color: var(--ink-soft); color: var(--ink); transform: translateY(-1px); }
 
 /* ── EMPTY STATE ── */
 .empty { text-align: center; padding: 36px 16px; color: var(--ink-soft); }
@@ -376,10 +419,22 @@ tbody tr.active-row td { border-bottom-color: #F0E2B3; }
 }
 
 /* ── PRINT ── */
+.print-header { display: none; }
 @media print {
-  .header, .search-row, .search-row-4, .table-wrap, .pagination, .rate-row, .rate-link, .action-row, .gauge-seg:not(.active) { display: none !important; }
-  .layout { grid-template-columns: 1fr; }
+  .header, .search-row, .search-row-4, .table-wrap, .pagination, .rate-row, .rate-link, .action-row, .gauge-seg:not(.active), .gauge-label { display: none !important; }
+  .layout { max-width: 100%; }
   body { background: white; }
+  .card { box-shadow: none; border: 1px solid #ddd; }
+  .print-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 0 0 16px 0;
+    border-bottom: 3px solid var(--red);
+    margin-bottom: 16px;
+  }
+  .print-header .ph-title { font-family: 'Oswald', sans-serif; font-size: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink); }
+  .print-header .ph-sub { font-size: 12px; color: var(--ink-mid); margin-top: 2px; }
 }
 
 @media (max-width: 980px) {
@@ -389,8 +444,11 @@ tbody tr.active-row td { border-bottom-color: #F0E2B3; }
 }
 @media (max-width: 520px) {
   .search-row, .search-row-4, .rate-row { grid-template-columns: 1fr 1fr; }
-  .duty-gauge { flex-wrap: wrap; }
-  .gauge-seg { flex: 1 1 30%; }
+  .duty-gauge { display: grid; grid-template-columns: 1fr 1fr 1fr; }
+  .gauge-seg { border-right: 1.5px solid var(--border); border-bottom: 1.5px solid var(--border); }
+  .gauge-seg:nth-child(3n) { border-right: none; }
+  .gauge-seg:nth-child(n+4) { border-bottom: none; }
+  .gauge-seg.active { border-color: var(--red); }
   .header-count { display: none; }
 }
 </style>
@@ -407,7 +465,7 @@ tbody tr.active-row td { border-bottom-color: #F0E2B3; }
       </svg>
     </div>
     <div>
-      <div class="header-title">Kansai Group</div>
+      <div class="header-title brand-font">Kansai Group</div>
       <div class="header-sub">Import Duty Calculator</div>
     </div>
   </div>
@@ -459,6 +517,18 @@ fetch('cars.json')
 function buildPage() {
   document.getElementById('app').innerHTML = `
   <div class="layout">
+
+    <!-- Print-only branded header -->
+    <div class="print-header">
+      <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="50,4 93,27 93,73 50,96 7,73 7,27" class="kg-hex"/>
+        <text x="50" y="63" text-anchor="middle" class="kg-text" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="34">KG</text>
+      </svg>
+      <div>
+        <div class="ph-title">Kansai Group — Import Duty Estimate</div>
+        <div class="ph-sub">Generated ${new Date().toLocaleDateString('en-MY', { day: 'numeric', month: 'long', year: 'numeric' })} · For reference only, subject to official customs assessment</div>
+      </div>
+    </div>
 
     <!-- LEFT: Vehicle Table -->
     <div>
@@ -832,7 +902,7 @@ function renderTable() {
     const isActive = sel && sel[0] === c[0];
     return `<tr class="${isActive ? 'active-row' : ''}" onclick="clickRow(${c[0]})">
       <td style="color:var(--ink-soft);font-size:11px;width:40px">${c[0]}</td>
-      <td class="td-brand">${escapeHtml(c[1])}</td>
+      <td class="td-brand"><span class="brand-badge">${escapeHtml(c[1].slice(0,2))}</span>${escapeHtml(c[1])}</td>
       <td class="td-model" title="${escapeHtml(c[2])}">${escapeHtml(c[2])}</td>
       <td class="td-cc">${c[3] === 0 ? 'EV' : c[3].toLocaleString()}</td>
       <td><span class="td-cur">${c[4]}</span></td>
@@ -890,6 +960,10 @@ function renderCalc() {
   const C = B + ship;
   const D = A + C;
   const E = D * duty.pct;
+  const total = D + E; // total landed cost
+  const pctFob  = (A / total) * 100;
+  const pctFees = (C / total) * 100;
+  const pctDuty = (E / total) * 100;
 
   ['dr0','dr1','dr2','dr3','dr4'].forEach(id => {
     document.getElementById(id).classList.remove('active');
@@ -961,6 +1035,20 @@ function renderCalc() {
           <div class="step-sub">${rm(D)} × ${duty.lbl}</div>
         </div>
         <div class="step-val big">${rm(E)}</div>
+      </div>
+    </div>
+
+    <div class="breakdown">
+      <div class="breakdown-label">Total Landed Cost Breakdown</div>
+      <div class="breakdown-bar">
+        <div class="breakdown-seg fob" style="flex-basis:${pctFob}%"></div>
+        <div class="breakdown-seg fees" style="flex-basis:${pctFees}%"></div>
+        <div class="breakdown-seg duty" style="flex-basis:${pctDuty}%"></div>
+      </div>
+      <div class="breakdown-legend">
+        <span><span class="dot fob"></span>Vehicle (FOB) — ${pctFob.toFixed(0)}%</span>
+        <span><span class="dot fees"></span>Insurance &amp; Shipping — ${pctFees.toFixed(0)}%</span>
+        <span><span class="dot duty"></span>Import Duty — ${pctDuty.toFixed(0)}%</span>
       </div>
     </div>
 
