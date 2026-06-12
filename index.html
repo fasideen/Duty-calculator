@@ -631,7 +631,7 @@ const i18n = {
     compareBarText: (n) => `${n} vehicle${n>1?'s':''} selected for comparison`,
     compareView: 'View Comparison', compareClear: 'Clear', compareRemove: 'Remove',
     compareLabels: { brand: 'Vehicle', cc: 'Engine', cur: 'Currency', fob: 'FOB', dutyPct: 'Duty Rate', dutyAmt: 'Estimated Duty', totalCost: 'Vehicle Value + Import Duty' },
-    excludesNote: 'Excludes excise duty, sales tax (SST), JPJ registration & road tax — calculated separately.',
+    dutyNote: 'Based on the Customs guide FOB value, not your actual invoice price. Other taxes (excise duty, SST, JPJ registration, road tax) are calculated separately.',
     printTitle: 'Kansai Group — Import Duty Estimate',
     printSub: (date) => `Generated ${date} · For reference only, subject to official customs assessment`,
   },
@@ -692,7 +692,7 @@ const i18n = {
     compareBarText: (n) => `${n} kenderaan dipilih untuk perbandingan`,
     compareView: 'Lihat Perbandingan', compareClear: 'Kosongkan', compareRemove: 'Buang',
     compareLabels: { brand: 'Kenderaan', cc: 'Enjin', cur: 'Mata Wang', fob: 'FOB', dutyPct: 'Kadar Duti', dutyAmt: 'Anggaran Duti', totalCost: 'Nilai Kenderaan + Duti Import' },
-    excludesNote: 'Tidak termasuk duti eksais, cukai jualan (SST), pendaftaran JPJ & cukai jalan — dikira berasingan.',
+    dutyNote: 'Berdasarkan nilai FOB panduan Kastam, bukan harga invois sebenar anda. Cukai lain (duti eksais, SST, pendaftaran JPJ, cukai jalan) dikira berasingan.',
     printTitle: 'Kansai Group — Anggaran Duti Import',
     printSub: (date) => `Dijana ${date} · Untuk rujukan sahaja, tertakluk kepada penilaian rasmi kastam`,
   },
@@ -1291,8 +1291,7 @@ function renderCompare() {
     const C = B + ship;
     const D = A + C;
     const E = D * duty.pct;
-    const total = D + E;
-    return { no, brand, model, cc, cur, fob, duty, E, total };
+    return { no, brand, model, cc, cur, fob, duty, E };
   });
 
   body.innerHTML = `
@@ -1314,11 +1313,10 @@ function renderCompare() {
       <tr><td class="metric-label">${L.fob}</td>${rows.map(r => `<td class="mono">${r.fob.toLocaleString()} ${r.cur}</td>`).join('')}</tr>
       <tr><td class="metric-label">${L.dutyPct}</td>${rows.map(r => `<td>${r.duty.lbl}</td>`).join('')}</tr>
       <tr><td class="metric-label">${L.dutyAmt}</td>${rows.map(r => `<td class="compare-duty">${rm(r.E)}</td>`).join('')}</tr>
-      <tr><td class="metric-label">${L.totalCost}</td>${rows.map(r => `<td class="compare-total">${rm(r.total)}</td>`).join('')}</tr>
     </tbody>
   </table>
   </div>
-  <div style="font-size:11px; color:var(--ink-soft); margin-top:10px; padding:0 4px;">*${t('excludesNote')}</div>`;
+  <div style="font-size:11px; color:var(--ink-soft); margin-top:10px; padding:0 4px;">*${t('dutyNote')}</div>`;
 }
 
 // ═══════════════════════════════════════
@@ -1358,10 +1356,6 @@ function renderCalc() {
   const C = B + ship;
   const D = A + C;
   const E = D * duty.pct;
-  const total = D + E; // total landed cost
-  const pctFob  = (A / total) * 100;
-  const pctFees = (C / total) * 100;
-  const pctDuty = (E / total) * 100;
 
   ['dr0','dr1','dr2','dr3','dr4'].forEach(id => {
     document.getElementById(id).classList.remove('active');
@@ -1436,26 +1430,12 @@ function renderCalc() {
       </div>
     </div>
 
-    <div class="breakdown">
-      <div class="breakdown-label">${t('breakdownTitle')}</div>
-      <div class="breakdown-bar">
-        <div class="breakdown-seg fob" style="flex-basis:${pctFob}%"></div>
-        <div class="breakdown-seg fees" style="flex-basis:${pctFees}%"></div>
-        <div class="breakdown-seg duty" style="flex-basis:${pctDuty}%"></div>
-      </div>
-      <div class="breakdown-legend">
-        <span><span class="dot fob"></span>${t('legendFob')} — ${pctFob.toFixed(0)}%</span>
-        <span><span class="dot fees"></span>${t('legendFees')} — ${pctFees.toFixed(0)}%</span>
-        <span><span class="dot duty"></span>${t('legendDuty')} — ${pctDuty.toFixed(0)}%</span>
-      </div>
-      <div style="font-size:11px; color:var(--ink-soft); margin-top:8px;">*${t('excludesNote')}</div>
-    </div>
-
     <div class="result-box">
       <div class="result-label">${t('resultLabel')}</div>
       <div class="result-value">${rm(E)}</div>
       <div class="result-sub">${escapeHtml(brand)} · ${duty.lbl} · ${ageLbl}</div>
     </div>
+    <div style="font-size:11px; color:var(--ink-soft); margin-top:8px; line-height:1.6;">*${t('dutyNote')}</div>
 
     <div class="action-row">
       <button class="btn btn-primary" onclick="window.print()">${t('printPdf')}</button>
@@ -1514,8 +1494,7 @@ ${t('stepD')} (D): ${rm(v.D)}
 ${t('dutySuffix')}: ${v.duty.lbl}
 
 ${t('resultLabel').toUpperCase()}: ${rm(v.E)}
-${t('compareLabels').totalCost}: ${rm(v.total)}
-*${t('excludesNote')}
+*${t('dutyNote')}
 
 ${t('printSub')('').split('·')[1]?.trim() || ''}`;
 
@@ -1576,8 +1555,7 @@ function sendWhatsApp(bil) {
 ${v.brand} ${v.model}
 ${evLbl} · ${v.cur} · ${ageLbl}
 ${t('resultLabel')}: ${rm(v.E)}
-${t('compareLabels').totalCost}: ${rm(v.total)}
-*${t('excludesNote')}`;
+*${t('dutyNote')}`;
 
   window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
 }
