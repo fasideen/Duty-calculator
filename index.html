@@ -20,6 +20,9 @@
   --red:     #E0303D;   /* Kansai red — accent / actions */
   --red-light: #FDECEE;
   --red-dark:  #C2202D;
+  --gold:      #C9A227;  /* third accent — highlights / selections */
+  --gold-light:#FBF3D9;
+  --gold-dark: #97791C;
   /* result green is semantic, not part of the core 3 */
   --green:      #16A34A;
   --green-bg:   #E9FBF1;
@@ -53,14 +56,13 @@ h1, h2, h3, .display { font-family: 'Space Grotesk', sans-serif; }
 }
 .header-left { display: flex; align-items: center; gap: 12px; }
 .logo-mark {
-  width: 38px; height: 38px;
+  width: 40px; height: 40px;
   display: grid;
   place-items: center;
-  background: var(--ink);
-  border-radius: 10px;
-  color: var(--red);
   flex-shrink: 0;
 }
+.kg-hex { fill: var(--red); }
+.kg-text { fill: #fff; }
 .header-title { font-weight: 700; font-size: 16px; color: var(--ink); letter-spacing: -0.01em; }
 .header-sub { font-size: 12px; color: var(--ink-soft); margin-top: 1px; }
 .header-right { display: flex; align-items: center; gap: 14px; }
@@ -81,13 +83,12 @@ h1, h2, h3, .display { font-family: 'Space Grotesk', sans-serif; }
 
 /* ── LAYOUT ── */
 .layout {
-  max-width: 1320px;
+  max-width: 980px;
   margin: 0 auto;
   padding: 20px;
-  display: grid;
-  grid-template-columns: 1fr 380px;
+  display: flex;
+  flex-direction: column;
   gap: 16px;
-  align-items: start;
 }
 
 /* ── CARD ── */
@@ -169,7 +170,7 @@ input.mono, .mono { font-family: 'JetBrains Mono', monospace; }
 }
 .ac-list.open { display: block; }
 .ac-item { padding: 8px 10px; font-size: 13px; cursor: pointer; border-radius: 7px; }
-.ac-item:hover, .ac-item.hl { background: var(--red-light); color: var(--red-dark); }
+.ac-item:hover, .ac-item.hl { background: var(--gold-light); color: var(--gold-dark); }
 .ac-empty { padding: 10px 12px; font-size: 12px; color: var(--ink-soft); }
 
 /* ── TABLE ── */
@@ -194,8 +195,8 @@ td {
 }
 tbody tr { cursor: pointer; transition: background 0.1s; }
 tbody tr:hover { background: var(--bg); }
-tbody tr.active-row { background: var(--red-light) !important; }
-tbody tr.active-row td { border-bottom-color: #FBD7DB; }
+tbody tr.active-row { background: var(--gold-light) !important; }
+tbody tr.active-row td { border-bottom-color: #F0E2B3; }
 .td-brand { font-weight: 700; font-size: 13px; white-space: nowrap; color: var(--ink); }
 .td-model { color: var(--ink-mid); font-size: 12px; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .td-cc { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-mid); }
@@ -236,9 +237,7 @@ tbody tr.active-row td { border-bottom-color: #FBD7DB; }
 .pag-btn.cur { background: var(--red); border-color: var(--red); color: #fff; }
 .pag-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-/* ── RIGHT COLUMN / CALCULATOR ── */
-.right-col { display: flex; flex-direction: column; gap: 14px; position: sticky; top: 84px; }
-
+/* ── CALCULATOR CARD ── */
 .rate-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; }
 .rate-row .field-label { font-size: 10px; }
 .rate-link { font-size: 11px; color: var(--ink-soft); margin-top: 10px; line-height: 1.6; }
@@ -284,6 +283,7 @@ tbody tr.active-row td { border-bottom-color: #FBD7DB; }
 .fob-display {
   background: var(--bg);
   border: 1.5px solid var(--border);
+  border-left: 4px solid var(--gold);
   border-radius: 9px;
   padding: 10px 12px;
   font-family: 'JetBrains Mono', monospace;
@@ -383,8 +383,7 @@ tbody tr.active-row td { border-bottom-color: #FBD7DB; }
 }
 
 @media (max-width: 980px) {
-  .layout { grid-template-columns: 1fr; padding: 14px; }
-  .right-col { position: static; order: -1; }
+  .layout { padding: 14px; }
   .search-row-4 { grid-template-columns: 1fr 1fr; }
   .header { padding: 0 14px; }
 }
@@ -402,11 +401,9 @@ tbody tr.active-row td { border-bottom-color: #FBD7DB; }
 <div class="header">
   <div class="header-left">
     <div class="logo-mark">
-      <svg width="22" height="22" viewBox="0 0 40 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="3" y="3" width="34" height="4.5" rx="1.5" fill="currentColor"/>
-        <rect x="6.5" y="11" width="27" height="3.5" rx="1.5" fill="currentColor"/>
-        <rect x="6" y="9" width="4.5" height="22" rx="1" fill="currentColor"/>
-        <rect x="29.5" y="9" width="4.5" height="22" rx="1" fill="currentColor"/>
+      <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="50,4 93,27 93,73 50,96 7,73 7,27" class="kg-hex"/>
+        <text x="50" y="63" text-anchor="middle" class="kg-text" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="34">KG</text>
       </svg>
     </div>
     <div>
@@ -433,6 +430,12 @@ let DB = [];          // [no, brand, model, cc, currency, fob12, fob24, fob36, f
 let filtered = [];
 let pg = 1;
 let sel = null;
+
+// Autocomplete keyboard-nav state
+const acState = {
+  brand: { items: [], idx: -1, onPick: null },
+  model: { items: [], idx: -1, onPick: null },
+};
 
 // ═══════════════════════════════════════════════════
 // LOAD DATA, THEN BUILD PAGE
@@ -547,9 +550,8 @@ function buildPage() {
       </div>
     </div>
 
-    <!-- RIGHT: Calculator (everything in ONE card) -->
-    <div class="right-col">
-      <div class="card">
+    <!-- Duty Calculator (full width, below the vehicle list) -->
+    <div class="card">
         <div class="card-header"><h2>Duty Calculator</h2></div>
         <div class="card-body">
 
@@ -604,7 +606,6 @@ function buildPage() {
           </div>
 
         </div>
-      </div>
     </div>
   </div>
   `;
@@ -638,6 +639,42 @@ function initEvents() {
 
   document.getElementById('sBrand').addEventListener('focus', onBrandInput);
   document.getElementById('sModel').addEventListener('focus', onModelInput);
+
+  document.getElementById('sBrand').addEventListener('keydown', (e) => handleAcKey(e, 'brand', 'brandList'));
+  document.getElementById('sModel').addEventListener('keydown', (e) => handleAcKey(e, 'model', 'modelList'));
+}
+
+// ═══════════════════════════════════════════════════
+// AUTOCOMPLETE — KEYBOARD NAVIGATION
+// ═══════════════════════════════════════════════════
+function handleAcKey(e, key, listId) {
+  const state = acState[key];
+  const ul = document.getElementById(listId);
+  if (!ul.classList.contains('open') || !state.items.length) return;
+
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    state.idx = Math.min(state.idx + 1, state.items.length - 1);
+    updateAcHl(listId, state);
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    state.idx = Math.max(state.idx - 1, 0);
+    updateAcHl(listId, state);
+  } else if (e.key === 'Enter') {
+    if (state.idx >= 0 && state.idx < state.items.length) {
+      e.preventDefault();
+      state.onPick(state.items[state.idx]);
+    }
+  } else if (e.key === 'Escape') {
+    ul.classList.remove('open');
+  }
+}
+
+function updateAcHl(listId, state) {
+  const ul = document.getElementById(listId);
+  [...ul.children].forEach((li, i) => li.classList.toggle('hl', i === state.idx));
+  const active = ul.children[state.idx];
+  if (active) active.scrollIntoView({ block: 'nearest' });
 }
 
 function showEmptyPrompt() {
@@ -658,12 +695,13 @@ function onBrandInput() {
   const val = document.getElementById('sBrand').value.toLowerCase().trim();
   const all = [...new Set(DB.map(c => c[1]))].sort();
   const matches = val ? all.filter(b => b.toLowerCase().includes(val)) : all;
-  renderAcList('brandList', matches, (picked) => {
+  const onPick = (picked) => {
     document.getElementById('sBrand').value = picked;
     document.getElementById('sModel').value = '';
     document.getElementById('brandList').classList.remove('open');
     doFilter();
-  });
+  };
+  renderAcList('brandList', matches, onPick, 'brand');
 }
 
 function onModelInput() {
@@ -673,15 +711,19 @@ function onModelInput() {
   if (brandVal) pool = pool.filter(c => c[1].toLowerCase() === brandVal);
   const all = [...new Set(pool.map(c => c[2]))].sort();
   const matches = val ? all.filter(m => m.toLowerCase().includes(val)) : all;
-  renderAcList('modelList', matches, (picked) => {
+  const onPick = (picked) => {
     document.getElementById('sModel').value = picked;
     document.getElementById('modelList').classList.remove('open');
     doFilter();
-  });
+  };
+  renderAcList('modelList', matches, onPick, 'model');
 }
 
-function renderAcList(listId, items, onPick) {
+function renderAcList(listId, items, onPick, key) {
   const ul = document.getElementById(listId);
+  acState[key].items = items;
+  acState[key].idx = -1;
+  acState[key].onPick = onPick;
   if (!items.length) {
     ul.innerHTML = '<li class="ac-empty">No matches</li>';
   } else {
