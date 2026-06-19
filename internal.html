@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kansai Group — Import Duty Calculator</title>
+<title>Kansai Group — Internal Costing Tool</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,4 93,27 93,73 50,96 7,73 7,27' fill='%23DC2626'/%3E%3Ctext x='50' y='63' text-anchor='middle' fill='%23fff' font-family='Arial, sans-serif' font-weight='700' font-size='34'%3EKG%3C/text%3E%3C/svg%3E">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
@@ -1019,7 +1020,7 @@ function buildPage() {
     </div>
 
     <!-- Duty Calculator (full width, below the vehicle list) -->
-    <div class="card">
+    <div class="card" id="dutyCard">
         <div class="card-header"><h2>${t('dutyCalculator')}</h2></div>
         <div class="card-body">
 
@@ -1077,7 +1078,7 @@ function buildPage() {
     </div>
 
     <!-- Internal Costing & Margin -->
-    <div class="card">
+    <div class="card" id="costingCard">
       <div class="card-header"><h2>Costing &amp; Margin</h2></div>
       <div class="card-body">
 
@@ -1109,7 +1110,8 @@ function buildPage() {
         <div id="profitSummary"></div>
 
         <div class="action-row">
-          <button class="btn btn-primary" onclick="window.print()">Print / PDF</button>
+          <button class="btn btn-primary" id="pdfBtn" onclick="downloadInternalPDF()">Download PDF</button>
+          <button class="btn btn-ghost" onclick="window.print()">Print</button>
           <button class="btn btn-ghost" id="copyInternalBtn" onclick="copyInternalSummary()">Copy Summary</button>
         </div>
       </div>
@@ -1967,6 +1969,105 @@ Margin: ${salePrice > 0 ? marginPct.toFixed(1) + '%' : '—'}`;
   } else {
     fallbackCopy(text, showCopied);
   }
+}
+
+// ═══════════════════════════════════════
+// DOWNLOAD PDF (internal costing summary)
+// ═══════════════════════════════════════
+function downloadInternalPDF() {
+  if (!sel) {
+    alert('Please select a vehicle first.');
+    return;
+  }
+
+  const btn = document.getElementById('pdfBtn');
+  const originalLabel = btn.textContent;
+  btn.textContent = 'Generating…';
+  btn.disabled = true;
+
+  const v = computeCalc(sel);
+  const stockCost = parseFloat(document.getElementById('stockCost')?.value) || 0;
+  const salePrice = parseFloat(document.getElementById('salePrice')?.value) || 0;
+  const feesTotal = feeRows.reduce((s, f) => s + (parseFloat(f.amount) || 0), 0);
+  const totalCost = stockCost + v.E + feesTotal;
+  const commissionTotal = agentRows.reduce((s, a) => s + salePrice * ((parseFloat(a.pct) || 0) / 100), 0);
+  const netProfit = salePrice - totalCost - commissionTotal;
+  const marginPct = salePrice > 0 ? (netProfit / salePrice) * 100 : 0;
+  const dateStr = new Date().toLocaleDateString('en-MY', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  const feeRowsHtml = feeRows.map(f =>
+    `<tr><td>${escapeHtml(f.label || '(unnamed)')}</td><td class="amt">${rm(parseFloat(f.amount) || 0)}</td></tr>`
+  ).join('');
+
+  const agentRowsHtml = agentRows.length
+    ? agentRows.map(a =>
+        `<tr><td>${escapeHtml(a.name || '(unnamed)')} (${a.pct}%)</td><td class="amt">${rm(salePrice * ((parseFloat(a.pct) || 0) / 100))}</td></tr>`
+      ).join('')
+    : '<tr><td colspan="2" style="color:#999">No agents on this deal</td></tr>';
+
+  const doc = document.createElement('div');
+  doc.style.cssText = 'width:760px; padding:40px; font-family:Arial, Helvetica, sans-serif; color:#14182A; background:#fff;';
+  doc.innerHTML = `
+    <div style="display:flex; align-items:center; gap:14px; border-bottom:3px solid #DC2626; padding-bottom:16px; margin-bottom:24px;">
+      <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="50,4 93,27 93,73 50,96 7,73 7,27" fill="#DC2626"/>
+        <text x="50" y="63" text-anchor="middle" fill="#fff" font-family="Arial, sans-serif" font-weight="700" font-size="34">KG</text>
+      </svg>
+      <div>
+        <div style="font-size:20px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">Kansai Group — Internal Costing</div>
+        <div style="font-size:12px; color:#666; margin-top:2px;">Generated ${dateStr} · CONFIDENTIAL — do not share with customer</div>
+      </div>
+    </div>
+
+    <div style="font-size:18px; font-weight:700; margin-bottom:2px;">${escapeHtml(sel[1])} ${escapeHtml(sel[2])}</div>
+    <div style="font-size:12px; color:#666; margin-bottom:20px;">${sel[3] === 0 ? 'Electric / EV' : sel[3].toLocaleString() + ' cc'} · ${sel[4]} · Duty rate ${v.duty.lbl}</div>
+
+    <table style="width:100%; border-collapse:collapse; font-size:13px; margin-bottom:18px;">
+      <tr style="border-bottom:1px solid #ddd;"><td style="padding:7px 0;">Import Duty</td><td style="padding:7px 0; text-align:right; font-family:monospace;">${rm(v.E)}</td></tr>
+      <tr style="border-bottom:1px solid #ddd;"><td style="padding:7px 0;">Stock Cost</td><td style="padding:7px 0; text-align:right; font-family:monospace;">${rm(stockCost)}</td></tr>
+      <tr style="border-bottom:1px solid #ddd;"><td colspan="2" style="padding:10px 0 4px; font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:0.04em; color:#666;">Additional Fees</td></tr>
+      ${feeRowsHtml.replace(/<td>/g, '<td style="padding:5px 0 5px 14px;">').replace(/<td class="amt">/g, '<td style="padding:5px 0; text-align:right; font-family:monospace;">')}
+      <tr style="border-top:2px solid #14182A;"><td style="padding:10px 0; font-weight:700;">Total Cost</td><td style="padding:10px 0; text-align:right; font-family:monospace; font-weight:700;">${rm(totalCost)}</td></tr>
+    </table>
+
+    <table style="width:100%; border-collapse:collapse; font-size:13px; margin-bottom:18px;">
+      <tr style="border-bottom:1px solid #ddd;"><td style="padding:7px 0;">Sale Price to Customer</td><td style="padding:7px 0; text-align:right; font-family:monospace;">${rm(salePrice)}</td></tr>
+      <tr style="border-bottom:1px solid #ddd;"><td colspan="2" style="padding:10px 0 4px; font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:0.04em; color:#666;">Agent / Broker Commission</td></tr>
+      ${agentRowsHtml.replace(/<td>/g, '<td style="padding:5px 0 5px 14px;">').replace(/<td class="amt">/g, '<td style="padding:5px 0; text-align:right; font-family:monospace;">')}
+      <tr style="border-top:1px solid #ddd;"><td style="padding:8px 0;">Total Commission</td><td style="padding:8px 0; text-align:right; font-family:monospace;">− ${rm(commissionTotal)}</td></tr>
+    </table>
+
+    <div style="background:${netProfit >= 0 ? '#EFFAF3' : '#FEF2F2'}; border-radius:10px; padding:18px 20px; margin-top:6px;">
+      <div style="font-size:12px; text-transform:uppercase; letter-spacing:0.05em; color:#666; margin-bottom:4px;">Net Profit</div>
+      <div style="font-size:26px; font-weight:700; font-family:monospace; color:${netProfit >= 0 ? '#16A34A' : '#DC2626'};">${rm(netProfit)}</div>
+      <div style="font-size:12px; color:#666; margin-top:4px;">${salePrice > 0 ? 'Margin: ' + marginPct.toFixed(1) + '% of sale price' : ''}</div>
+    </div>
+
+    <div style="font-size:10px; color:#999; margin-top:24px; line-height:1.6;">
+      Internal document for Kansai Group staff use only. Duty figures are based on the Customs guide FOB value and entered exchange rates; verify before finalising any quote.
+    </div>
+  `;
+
+  document.body.appendChild(doc);
+
+  const fileName = `Kansai-Internal-${(sel[1] + '-' + sel[2]).replace(/[^a-z0-9]+/gi, '-')}.pdf`;
+
+  html2pdf().set({
+    margin: 0,
+    filename: fileName,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
+  }).from(doc).save().then(() => {
+    document.body.removeChild(doc);
+    btn.textContent = originalLabel;
+    btn.disabled = false;
+  }).catch(() => {
+    document.body.removeChild(doc);
+    btn.textContent = originalLabel;
+    btn.disabled = false;
+    alert('Something went wrong generating the PDF. Please try again.');
+  });
 }
 </script>
 </body>
