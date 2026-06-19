@@ -1979,6 +1979,10 @@ function downloadInternalPDF() {
     alert('Please select a vehicle first.');
     return;
   }
+  if (typeof html2pdf === 'undefined') {
+    alert('PDF library failed to load. Please check your internet connection and try again.');
+    return;
+  }
 
   const btn = document.getElementById('pdfBtn');
   const originalLabel = btn.textContent;
@@ -2051,9 +2055,9 @@ function downloadInternalPDF() {
   document.body.appendChild(doc);
   doc.style.position = 'fixed';
   doc.style.top = '0';
-  doc.style.left = '0';
-  doc.style.zIndex = '-1';
+  doc.style.left = '-9999px';
   doc.style.opacity = '1';
+  doc.style.visibility = 'visible';
 
   const fileName = `Kansai-Internal-${(sel[1] + '-' + sel[2]).replace(/[^a-z0-9]+/gi, '-')}.pdf`;
 
@@ -2064,7 +2068,7 @@ function downloadInternalPDF() {
         margin: 0,
         filename: fileName,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', windowWidth: doc.scrollWidth, windowHeight: doc.scrollHeight },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
         jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
       }).from(doc).save().then(() => {
         document.body.removeChild(doc);
