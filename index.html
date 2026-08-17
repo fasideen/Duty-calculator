@@ -3,12 +3,43 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kansai Group — Import Duty Calculator</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,4 93,27 93,73 50,96 7,73 7,27' fill='%23E60012'/%3E%3Ctext x='50' y='63' text-anchor='middle' fill='%23fff' font-family='Arial, sans-serif' font-weight='700' font-size='34'%3EKG%3C/text%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>Malaysia Import Duty Calculator — Japanese & Recon Cars | Kansai Group</title>
+<meta name="description" content="Free Malaysian import duty calculator for Japanese, UK and Australian recon cars. Calculate import duty, insurance and shipping costs instantly. Covers Toyota, Lexus, Nissan, BMW and 2,279 vehicles.">
+<meta name="keywords" content="malaysia import duty calculator, recon car duty malaysia, japanese car import duty, import duty kereta malaysia, duti import kereta, kansai group duty calculator">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://duty-calculator-ten.vercel.app">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Malaysia Import Duty Calculator — Japanese & Recon Cars">
+<meta property="og:description" content="Free Malaysian import duty calculator for Japanese, UK and Australian recon cars. 2,279 vehicles in database. Calculate instantly.">
+<meta property="og:url" content="https://duty-calculator-ten.vercel.app">
+<meta property="og:site_name" content="Kansai Group Malaysia">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Malaysia Import Duty Calculator — Kansai Group">
+<meta name="twitter:description" content="Free import duty calculator for Japanese recon cars in Malaysia. 2,279 vehicles in database.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Malaysia Import Duty Calculator",
+  "description": "Free Malaysian import duty calculator for Japanese, UK and Australian recon cars. Calculate import duty, insurance and shipping costs instantly.",
+  "url": "https://www.kansaigroup.my/duty-calculator.html",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Web",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "MYR"
+  },
+  "provider": {
+    "@type": "AutoDealer",
+    "name": "Kansai Group Malaysia",
+    "url": "https://www.kansaigroup.my"
+  }
+}
+</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,4 93,27 93,73 50,96 7,73 7,27' fill='%23DC2626'/%3E%3Ctext x='50' y='63' text-anchor='middle' fill='%23fff' font-family='Arial, sans-serif' font-weight='700' font-size='34'%3EKG%3C/text%3E%3C/svg%3E">
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -20,7 +51,7 @@
   --ink-mid: #58607A;
   --ink-soft:#9AA2B8;
   --border:  #E6E8F0;
-  --red:     #E60012;   /* Kansai red — accent / actions / selection */
+  --red:     #DC2626;   /* Kansai red — accent / actions / selection */
   --red-light: #FDECEC;
   --red-dark:  #B91C1C;
   --gold:    #D4AF37;   /* brand accent — used sparingly */
@@ -41,8 +72,8 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, .display { font-family: 'Rajdhani', sans-serif; font-weight: 700; }
-.brand-font { font-family: 'Bebas Neue', sans-serif; text-transform: uppercase; letter-spacing: 0.04em; }
+h1, h2, h3, .display { font-family: 'Space Grotesk', sans-serif; }
+.brand-font { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.04em; }
 
 /* ── HEADER ── */
 .header {
@@ -66,7 +97,7 @@ h1, h2, h3, .display { font-family: 'Rajdhani', sans-serif; font-weight: 700; }
 }
 .kg-hex { fill: var(--red); }
 .kg-text { fill: #fff; }
-.header-title { font-weight: 400; font-size: 22px; color: #fff; letter-spacing: 2px; }
+.header-title { font-weight: 700; font-size: 19px; color: #fff; }
 .header-sub { font-size: 12px; color: rgba(255,255,255,0.55); margin-top: 2px; font-family: 'Inter', sans-serif; text-transform: none; letter-spacing: 0; }
 .header-right { display: flex; align-items: center; gap: 14px; }
 .rate-pill {
@@ -120,7 +151,7 @@ h1, h2, h3, .display { font-family: 'Rajdhani', sans-serif; font-weight: 700; }
   align-items: center;
   justify-content: space-between;
 }
-.card-header h2 { font-size: 32px; font-weight: 400; color: var(--ink); font-family: 'Bebas Neue', sans-serif; text-transform: uppercase; letter-spacing: 0.08em; }
+.card-header h2 { font-size: 16px; font-weight: 600; color: var(--ink); font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.05em; }
 .card-header .count {
   font-size: 11px;
   background: var(--bg);
@@ -219,7 +250,7 @@ tbody tr.active-row td { border-bottom-color: #FBD5D5; }
   border-radius: 50%;
   background: var(--ink);
   color: #fff;
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: 'Oswald', sans-serif;
   font-size: 11px;
   font-weight: 600;
   display: flex;
@@ -300,7 +331,7 @@ tbody tr.active-row td { border-bottom-color: #FBD5D5; }
 
 /* ── CALC PANEL ── */
 .sel-info { margin-bottom: 14px; }
-.sel-brand { font-weight: 700; font-size: 19px; color: var(--ink); font-family: 'Bebas Neue', sans-serif; text-transform: uppercase; letter-spacing: 0.04em; }
+.sel-brand { font-weight: 700; font-size: 19px; color: var(--ink); font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.04em; }
 .sel-model { font-size: 12px; color: var(--ink-mid); margin-top: 3px; line-height: 1.4; }
 .sel-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
 .tag {
@@ -364,7 +395,7 @@ tbody tr.active-row td { border-bottom-color: #FBD5D5; }
 
 /* ── COST BREAKDOWN ── */
 .breakdown { margin-top: 18px; }
-.breakdown-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-soft); margin-bottom: 9px; font-family: 'Bebas Neue', sans-serif; }
+.breakdown-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-soft); margin-bottom: 9px; font-family: 'Oswald', sans-serif; }
 .breakdown-bar { display: flex; height: 16px; border-radius: 8px; overflow: hidden; }
 .breakdown-seg { transition: flex-basis 0.3s ease; }
 .breakdown-seg.fob  { background: var(--ink); }
@@ -386,7 +417,7 @@ tbody tr.active-row td { border-bottom-color: #FBD5D5; }
   text-align: center;
   margin-top: 16px;
 }
-.result-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--green-text); margin-bottom: 6px; font-family: 'Bebas Neue', sans-serif; }
+.result-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--green-text); margin-bottom: 6px; font-family: 'Oswald', sans-serif; }
 .result-value { font-family: 'JetBrains Mono', monospace; font-size: 34px; font-weight: 700; color: var(--green); letter-spacing: -0.01em; }
 .result-sub { font-size: 12px; color: var(--green-text); margin-top: 6px; font-weight: 500; }
 
@@ -433,7 +464,7 @@ tbody tr.active-row td { border-bottom-color: #FBD5D5; }
 .compare-table th, .compare-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
 .compare-table th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); font-weight: 700; white-space: nowrap; }
 .compare-table td.metric-label { font-weight: 600; color: var(--ink-mid); white-space: nowrap; }
-.compare-table .compare-model { font-weight: 700; font-family: 'Bebas Neue', sans-serif; text-transform: uppercase; letter-spacing: 0.03em; font-size: 13px; }
+.compare-table .compare-model { font-weight: 700; font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.03em; font-size: 13px; }
 .compare-table .compare-sub { font-size: 11px; color: var(--ink-mid); font-weight: 400; text-transform: none; letter-spacing: 0; margin-top: 2px; }
 .compare-table .compare-duty { color: var(--red); font-weight: 700; font-family: 'JetBrains Mono', monospace; }
 .compare-table .compare-total { color: var(--green); font-weight: 700; font-family: 'JetBrains Mono', monospace; font-size: 14px; }
@@ -457,99 +488,7 @@ tbody tr.active-row td { border-bottom-color: #FBD5D5; }
 .faq-a.open { max-height: 400px; padding-bottom: 14px; }
 .faq-icon.open { transform: rotate(45deg); }
 
-/* ── PASSWORD GATE ── */
-.gate-overlay {
-  position: fixed; inset: 0;
-  background: var(--bg);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 1000; padding: 20px;
-}
-.gate-box {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 44px 40px 40px;
-  max-width: 400px; width: 100%;
-  text-align: center;
-}
-.gate-logo {
-  margin: 0 auto 20px;
-  display: block;
-}
-.gate-title {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 22px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--ink);
-  margin: 0 0 4px;
-}
-.gate-sub {
-  font-size: 12px;
-  color: var(--ink-soft);
-  margin: 0 0 28px;
-  line-height: 1.6;
-}
-.gate-input-wrap {
-  position: relative;
-  margin-bottom: 12px;
-}
-.gate-input-wrap input {
-  width: 100%;
-  padding: 13px 48px 13px 16px;
-  border: 1.5px solid var(--border);
-  border-radius: 10px;
-  font-size: 15px;
-  font-family: 'Inter', sans-serif;
-  background: var(--bg);
-  color: var(--ink);
-  box-sizing: border-box;
-  transition: border-color 0.15s;
-  outline: none;
-  letter-spacing: 0.15em;
-}
-.gate-input-wrap input:focus { border-color: var(--ink); }
-.gate-input-wrap input.error { border-color: var(--red); }
-.gate-lock-icon {
-  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
-  color: var(--ink-soft); pointer-events: none;
-}
-.gate-btn {
-  width: 100%;
-  background: var(--red) !important;
-  color: #fff !important;
-  border: none !important;
-  border-radius: 10px;
-  padding: 13px;
-  font-size: 14px;
-  font-weight: 700;
-  font-family: 'Bebas Neue', sans-serif;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  cursor: pointer;
-}
-.gate-btn:active { transform: scale(0.98); }
-.gate-error {
-  display: none;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  color: var(--red);
-  font-size: 12px;
-  font-weight: 500;
-  margin-top: 12px;
-}
-.gate-divider {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 28px 0 20px;
-}
-.gate-footer {
-  font-size: 11px;
-  color: var(--ink-soft);
-  line-height: 1.6;
-}
+
 
 /* ── FOOTER ── */
 .site-footer {
@@ -587,7 +526,7 @@ tbody tr.active-row td { border-bottom-color: #FBD5D5; }
     border-bottom: 3px solid var(--red);
     margin-bottom: 16px;
   }
-  .print-header .ph-title { font-family: 'Bebas Neue', sans-serif; font-size: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink); }
+  .print-header .ph-title { font-family: 'Oswald', sans-serif; font-size: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink); }
   .print-header .ph-sub { font-size: 12px; color: var(--ink-mid); margin-top: 2px; }
   #calcBody > * { animation: none !important; opacity: 1 !important; transform: none !important; }
 }
@@ -610,13 +549,23 @@ tbody tr.active-row td { border-bottom-color: #FBD5D5; }
 </head>
 <body>
 
+
+<!-- CTA Banner -->
+<div style="background:var(--red);padding:10px 24px;text-align:center;">
+  <span style="color:#fff;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;letter-spacing:0.5px;">
+    Ready to import? 
+    <a href="https://www.kansaigroup.my" style="color:#fff;font-weight:700;text-decoration:underline;margin-left:8px;">Browse our stock in KL →</a>
+    <a href="https://wa.me/601151177026" style="color:#fff;font-weight:700;text-decoration:underline;margin-left:16px;">WhatsApp Us →</a>
+  </span>
+</div>
+
 <!-- HEADER -->
 <div class="header">
   <div class="header-left">
     <div class="logo-mark">
       <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
         <polygon points="50,4 93,27 93,73 50,96 7,73 7,27" class="kg-hex"/>
-        <text x="50" y="63" text-anchor="middle" class="kg-text" font-family="Bebas Neue, sans-serif" font-weight="700" font-size="34">KG</text>
+        <text x="50" y="63" text-anchor="middle" class="kg-text" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="34">KG</text>
       </svg>
     </div>
     <div>
@@ -634,81 +583,15 @@ tbody tr.active-row td { border-bottom-color: #FBD5D5; }
   </div>
 </div>
 
-<!-- PASSWORD GATE -->
-<div id="gate" class="gate-overlay">
-  <div class="gate-box">
-
-    <svg class="gate-logo" width="52" height="52" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-      <polygon points="50,4 93,27 93,73 50,96 7,73 7,27" class="kg-hex"/>
-      <text x="50" y="63" text-anchor="middle" class="kg-text" font-family="Bebas Neue, sans-serif" font-weight="700" font-size="34">KG</text>
-    </svg>
-
-    <div class="gate-title">Kansai Group</div>
-    <div class="gate-sub">Import Duty Calculator<br>Please enter your password to continue.</div>
-
-    <div class="gate-input-wrap">
-      <input type="password" id="gatePw" placeholder="Enter password" autocomplete="off">
-      <svg class="gate-lock-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
-      </svg>
-    </div>
-
-    <button class="gate-btn" onclick="checkPassword()">Unlock</button>
-
-    <div class="gate-error" id="gateError">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="0.5" fill="currentColor"/></svg>
-      Incorrect password — please try again.
-    </div>
-
-    <hr class="gate-divider">
-    <div class="gate-footer">This tool is for authorised Kansai Group staff only.<br>Duty estimates are for reference purposes.</div>
-
-  </div>
-</div>
-
-<div id="app" style="display:none">
+<div id="app">
   <div class="loading-screen">Loading vehicle database…</div>
 </div>
 
-<div class="site-footer" id="siteFooter" style="display:none">
+<div class="site-footer" id="siteFooter">
   Estimates only, for reference purposes. Exchange rates and duty calculations are based on figures you enter and may differ from the official assessment by the Royal Malaysian Customs Department.
   Official rates: <a href="http://customsgc.gov.my/cgi-bin/exchange.cgi" target="_blank" style="color:var(--ink-mid)">customsgc.gov.my</a>.
   © <span id="footYear"></span> Kansai Group.
 </div>
-
-<script>
-const STAFF_PASSWORD = 'kansai2026'; // ← change this to your own password
-
-function checkPassword() {
-  const input = document.getElementById('gatePw');
-  const val = input.value;
-  if (val === STAFF_PASSWORD) {
-    document.getElementById('gate').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    document.getElementById('siteFooter').style.display = 'block';
-    try { sessionStorage.setItem('kansaiDutyAuth', '1'); } catch(e) {}
-  } else {
-    input.classList.add('error');
-    document.getElementById('gateError').style.display = 'flex';
-    input.select();
-  }
-}
-document.addEventListener('DOMContentLoaded', () => {
-  const gatePw = document.getElementById('gatePw');
-  gatePw.addEventListener('keydown', e => {
-    gatePw.classList.remove('error');
-    document.getElementById('gateError').style.display = 'none';
-    if (e.key === 'Enter') checkPassword();
-  });
-  try {
-    if (sessionStorage.getItem('kansaiDutyAuth') === '1') {
-      document.getElementById('gate').style.display = 'none';
-      document.getElementById('app').style.display = 'block';
-      document.getElementById('siteFooter').style.display = 'block';
-    }
-  } catch(e) {}
-});
-</script>
 
 <script>
 // ═══════════════════════════════════════════════════
@@ -907,7 +790,7 @@ function buildPage() {
     <div class="print-header">
       <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
         <polygon points="50,4 93,27 93,73 50,96 7,73 7,27" class="kg-hex"/>
-        <text x="50" y="63" text-anchor="middle" class="kg-text" font-family="Bebas Neue, sans-serif" font-weight="700" font-size="34">KG</text>
+        <text x="50" y="63" text-anchor="middle" class="kg-text" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="34">KG</text>
       </svg>
       <div>
         <div class="ph-title">${t('printTitle')}</div>
