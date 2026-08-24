@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kansai Group — Quotation & Invoice Generator</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root {
+    --red:#E60012; --red-dark:#B3000E; --gold:#C8A23C;
+    --navy:#111827; --bg-main:#FFFFFF; --bg-alt:#F4F5F7;
+    --text-main:#111827; --text-muted:#6B7280; --border:#E5E7EB; --green:#16A34A;
+    --shadow-sm:0 1px 3px rgba(0,0,0,0.05); --shadow-md:0 8px 24px rgba(0,0,0,0.08);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Inter',sans-serif; background:var(--bg-alt); color:var(--text-main); -webkit-font-smoothing:antialiased; }
+  .bebas { font-family:'Bebas Neue',sans-serif; }
+  .rajdhani { font-family:'Rajdhani',sans-serif; }
+  .mono { font-family:'JetBrains Mono',monospace; }
+  input, select, button { font-family:'Inter',sans-serif; }
+
+  /* LOGIN GATE */
+  .gate { position:fixed; inset:0; background:var(--bg-alt); display:flex; align-items:center; justify-content:center; padding:20px; z-index:100; }
+  .gate-box { background:#fff; border:1px solid var(--border); border-radius:18px; padding:40px 36px; max-width:380px; width:100%; text-align:center; box-shadow:var(--shadow-md); }
+  .gate-mark { width:52px; height:52px; background:var(--red); clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%); display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:22px; color:#fff; margin:0 auto 18px; }
+  .gate-title { font-family:'Bebas Neue',sans-serif; font-size:24px; letter-spacing:2px; }
+  .gate-sub { font-size:12px; color:var(--text-muted); margin:4px 0 24px; }
+  .gate input { width:100%; padding:12px 14px; border:1px solid var(--border); border-radius:9px; font-size:14px; background:var(--bg-alt); outline:none; margin-bottom:12px; text-align:center; }
+  .gate input:focus { border-color:var(--navy); background:#fff; }
+  .gate button { width:100%; background:var(--red); color:#fff; border:none; border-radius:9px; padding:13px; font-family:'Rajdhani',sans-serif; font-size:15px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; cursor:pointer; }
+  .gate button:hover { background:var(--red-dark); }
+  .gate-error { color:var(--red); font-size:12px; margin-top:8px; display:none; }
+
+  /* LAYOUT */
+  .app { display:none; max-width:1300px; margin:0 auto; padding:24px; }
+  .topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; gap:16px; }
+  .brand { display:flex; align-items:center; gap:12px; }
+  .brand-mark { width:44px; height:44px; background:var(--red); clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%); display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:18px; color:#fff; }
+  .brand-text .t { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:2px; line-height:1; }
+  .brand-text .s { font-size:10px; letter-spacing:2px; color:var(--text-muted); text-transform:uppercase; margin-top:2px; }
+
+  .grid { display:grid; grid-template-columns:400px 1fr; gap:24px; align-items:start; }
+
+  /* FORM PANEL */
+  .panel { background:#fff; border:1px solid var(--border); border-radius:14px; padding:22px; margin-bottom:18px; }
+  .panel h3 { font-family:'Rajdhani',sans-serif; font-size:15px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+  .panel h3 .num { width:22px; height:22px; background:var(--red); color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-family:'Inter'; }
+  .field { margin-bottom:14px; }
+  .field label { font-size:11px; font-weight:600; color:var(--text-main); text-transform:uppercase; letter-spacing:0.4px; display:block; margin-bottom:6px; }
+  .field input, .field select { width:100%; padding:10px 13px; border:1px solid var(--border); border-radius:8px; font-size:14px; background:var(--bg-alt); outline:none; }
+  .field input:focus, .field select:focus { border-color:var(--navy); background:#fff; }
+  .field-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+  /* MODE TOGGLE */
+  .mode-toggle { display:flex; background:var(--bg-alt); border-radius:9px; padding:4px; margin-bottom:20px; }
+  .mode-btn { flex:1; padding:11px; border:none; background:none; border-radius:6px; font-family:'Rajdhani',sans-serif; font-size:14px; font-weight:700; letter-spacing:1px; text-transform:uppercase; cursor:pointer; color:var(--text-muted); transition:all 0.15s; }
+  .mode-btn.active { background:var(--red); color:#fff; }
+
+  /* LINE ITEMS */
+  .line-item { display:flex; align-items:center; gap:10px; padding:11px 0; border-bottom:1px solid var(--border); }
+  .line-item:last-child { border-bottom:none; }
+  .li-toggle { flex-shrink:0; }
+  .switch { width:40px; height:23px; background:var(--border); border-radius:20px; position:relative; cursor:pointer; transition:background 0.2s; }
+  .switch.on { background:var(--green); }
+  .switch::after { content:''; position:absolute; top:3px; left:3px; width:17px; height:17px; background:#fff; border-radius:50%; transition:transform 0.2s; box-shadow:0 1px 2px rgba(0,0,0,0.2); }
+  .switch.on::after { transform:translateX(17px); }
+  .li-label { flex:1; font-size:13px; }
+  .li-label input.li-name { border:none; background:none; font-size:13px; font-weight:500; width:100%; padding:4px 0; outline:none; color:var(--text-main); }
+  .li-amount { width:120px; flex-shrink:0; }
+  .li-amount input { width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:6px; font-size:13px; font-family:'JetBrains Mono',monospace; text-align:right; background:var(--bg-alt); outline:none; }
+  .li-amount input:focus { border-color:var(--navy); background:#fff; }
+  .li-remove { color:var(--text-muted); cursor:pointer; padding:4px; flex-shrink:0; }
+  .li-remove:hover { color:var(--red); }
+  .add-item-btn { width:100%; padding:11px; border:1px dashed var(--border); background:none; border-radius:8px; color:var(--text-muted); font-size:12.5px; font-weight:600; cursor:pointer; margin-top:12px; font-family:'Rajdhani',sans-serif; letter-spacing:0.5px; text-transform:uppercase; }
+  .add-item-btn:hover { border-color:var(--red); color:var(--red); }
+
+  .actions { display:flex; gap:10px; margin-top:8px; }
+  .btn-primary { flex:1; background:var(--red); color:#fff; border:none; border-radius:9px; padding:14px; font-family:'Rajdhani',sans-serif; font-size:14px; font-weight:700; letter-spacing:1px; text-transform:uppercase; cursor:pointer; }
+  .btn-primary:hover { background:var(--red-dark); }
+  .btn-secondary { background:#fff; color:var(--text-main); border:1px solid var(--border); border-radius:9px; padding:14px 20px; font-family:'Rajdhani',sans-serif; font-size:14px; font-weight:700; letter-spacing:1px; text-transform:uppercase; cursor:pointer; }
+  .btn-secondary:hover { border-color:var(--navy); }
+
+  /* PREVIEW / DOCUMENT */
+  .preview-wrap { position:sticky; top:24px; }
+  .preview-label { font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:10px; }
+  .doc { background:#fff; border:1px solid var(--border); border-radius:8px; box-shadow:var(--shadow-md); overflow:hidden; }
+
+  /* The actual document (A4 ratio) */
+  #document { width:100%; background:#fff; padding:48px 44px; color:var(--navy); }
+  .doc-head { display:flex; justify-content:space-between; align-items:flex-start; padding-bottom:28px; border-bottom:3px solid var(--red); margin-bottom:28px; }
+  .doc-logo-row { display:flex; align-items:center; gap:12px; }
+  .doc-mark { width:52px; height:52px; background:var(--red); clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%); display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:22px; color:#fff; }
+  .doc-company { font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:2px; line-height:1; }
+  .doc-company-sub { font-size:9px; letter-spacing:2px; color:var(--text-muted); text-transform:uppercase; margin-top:3px; }
+  .doc-type { text-align:right; }
+  .doc-type-label { font-family:'Bebas Neue',sans-serif; font-size:40px; letter-spacing:2px; color:var(--red); line-height:1; }
+  .doc-number { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-muted); margin-top:4px; }
+
+  .doc-meta { display:flex; justify-content:space-between; margin-bottom:28px; gap:30px; }
+  .doc-meta-block { font-size:12px; line-height:1.7; }
+  .doc-meta-block .mlabel { font-size:9px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:5px; }
+  .doc-meta-block .mval { font-weight:600; }
+  .doc-meta-block .mval-big { font-family:'Rajdhani',sans-serif; font-size:16px; font-weight:700; }
+
+  .doc-vehicle { background:var(--bg-alt); border-radius:8px; padding:16px 18px; margin-bottom:24px; }
+  .doc-vehicle .vlabel { font-size:9px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
+  .doc-vehicle .vname { font-family:'Rajdhani',sans-serif; font-size:20px; font-weight:700; }
+  .doc-vehicle .vspecs { font-size:11px; color:var(--text-muted); margin-top:2px; }
+
+  table.doc-table { width:100%; border-collapse:collapse; margin-bottom:24px; }
+  table.doc-table th { text-align:left; font-size:9px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; padding:10px 12px; border-bottom:2px solid var(--navy); }
+  table.doc-table th.right { text-align:right; }
+  table.doc-table td { padding:12px; font-size:13px; border-bottom:1px solid var(--border); }
+  table.doc-table td.right { text-align:right; font-family:'JetBrains Mono',monospace; font-weight:500; }
+  table.doc-table .item-desc { font-weight:500; }
+
+  .doc-total-row { display:flex; justify-content:flex-end; }
+  .doc-total-box { width:280px; }
+  .doc-subtotal { display:flex; justify-content:space-between; padding:8px 12px; font-size:13px; color:var(--text-muted); }
+  .doc-grand { display:flex; justify-content:space-between; align-items:center; padding:16px 12px; background:var(--navy); border-radius:8px; margin-top:6px; }
+  .doc-grand .glabel { font-family:'Rajdhani',sans-serif; font-size:14px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:#fff; }
+  .doc-grand .gval { font-family:'Bebas Neue',sans-serif; font-size:30px; color:var(--gold); letter-spacing:1px; }
+  .doc-grand .gval .cur { font-size:14px; color:rgba(255,255,255,0.7); }
+
+  .doc-footer { margin-top:32px; padding-top:20px; border-top:1px solid var(--border); }
+  .doc-notes { font-size:11px; color:var(--text-muted); line-height:1.7; margin-bottom:16px; }
+  .doc-notes strong { color:var(--navy); }
+  .doc-bank { background:var(--bg-alt); border-radius:8px; padding:14px 16px; font-size:11px; line-height:1.7; margin-bottom:16px; }
+  .doc-bank .blabel { font-size:9px; font-weight:700; color:var(--red); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+  .doc-sign { display:flex; justify-content:space-between; margin-top:36px; gap:40px; }
+  .doc-sign-block { flex:1; }
+  .doc-sign-line { border-top:1px solid var(--navy); padding-top:6px; font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; }
+  .doc-contact { text-align:center; margin-top:28px; font-size:10px; color:var(--text-muted); letter-spacing:0.3px; }
+
+  @media (max-width:960px) {
+    .grid { grid-template-columns:1fr; }
+    .preview-wrap { position:static; }
+  }
+</style>
+</head>
+<body>
+
+<!-- GATE -->
+<div class="gate" id="gate">
+  <div class="gate-box">
+    <div class="gate-mark">KG</div>
+    <div class="gate-title bebas">Quotation Generator</div>
+    <div class="gate-sub">Staff access only</div>
+    <input type="password" id="gatePw" placeholder="Enter password" onkeydown="if(event.key==='Enter')checkGate()">
+    <button onclick="checkGate()">Unlock</button>
+    <div class="gate-error" id="gateError">Incorrect password</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app">
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">KG</div>
+      <div class="brand-text">
+        <div class="t">KANSAI GROUP</div>
+        <div class="s">Quotation & Invoice Generator</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- LEFT: FORM -->
+    <div>
+      <div class="mode-toggle">
+        <button class="mode-btn active" id="modeQuote" onclick="setMode('quotation')">Quotation</button>
+        <button class="mode-btn" id="modeInvoice" onclick="setMode('invoice')">Invoice</button>
+      </div>
+
+      <div class="panel">
+        <h3><span class="num">1</span> Customer Details</h3>
+        <div class="field">
+          <label>Customer Name</label>
+          <input type="text" id="custName" placeholder="e.g. Ahmad bin Ali" oninput="render()">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Phone</label>
+            <input type="text" id="custPhone" placeholder="+60..." oninput="render()">
+          </div>
+          <div class="field">
+            <label>Date</label>
+            <input type="date" id="docDate" oninput="render()">
+          </div>
+        </div>
+        <div class="field">
+          <label>Email <span style="color:var(--text-muted);font-weight:400;text-transform:none;">(optional)</span></label>
+          <input type="text" id="custEmail" placeholder="email@example.com" oninput="render()">
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3><span class="num">2</span> Vehicle</h3>
+        <div class="field">
+          <label>Vehicle Name</label>
+          <input type="text" id="vehName" placeholder="e.g. Toyota Alphard Executive Lounge" oninput="render()">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Year</label>
+            <input type="text" id="vehYear" placeholder="2023" oninput="render()">
+          </div>
+          <div class="field">
+            <label>Grade / Mileage</label>
+            <input type="text" id="vehSpecs" placeholder="Grade 5.0 · 8,200km" oninput="render()">
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3><span class="num">3</span> Line Items</h3>
+        <div id="lineItems"></div>
+        <button class="add-item-btn" onclick="addLineItem()">+ Add Custom Item</button>
+      </div>
+
+      <div class="actions">
+        <button class="btn-primary" onclick="downloadPDF()">Download PDF</button>
+        <button class="btn-secondary" onclick="window.print()">Print</button>
+      </div>
+    </div>
+
+    <!-- RIGHT: PREVIEW -->
+    <div class="preview-wrap">
+      <div class="preview-label">Live Preview</div>
+      <div class="doc">
+        <div id="document"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const PASSWORD = 'kansai2026';
+let mode = 'quotation';
+
+// Default line items (fixed set with toggles) — customer-facing sale-side only
+let lineItems = [
+  { name: 'Vehicle Price (inclusive of import duty & shipping)', amount: 0, show: true, fixed: true },
+  { name: 'Registration & Number Plate', amount: 0, show: true, fixed: true },
+  { name: 'Road Tax (1 year)', amount: 0, show: true, fixed: true },
+  { name: 'Insurance (1 year)', amount: 0, show: true, fixed: true },
+  { name: 'Handling & Documentation', amount: 0, show: true, fixed: true },
+];
+
+function checkGate() {
+  const pw = document.getElementById('gatePw').value;
+  if (pw === PASSWORD) {
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    initDate();
+    renderLineItems();
+    render();
+  } else {
+    document.getElementById('gateError').style.display = 'block';
+  }
+}
+
+function initDate() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('docDate').value = today;
+}
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('modeQuote').classList.toggle('active', m === 'quotation');
+  document.getElementById('modeInvoice').classList.toggle('active', m === 'invoice');
+  render();
+}
+
+function renderLineItems() {
+  const container = document.getElementById('lineItems');
+  container.innerHTML = lineItems.map((item, i) => `
+    <div class="line-item">
+      <div class="li-toggle">
+        <div class="switch ${item.show ? 'on' : ''}" onclick="toggleItem(${i})"></div>
+      </div>
+      <div class="li-label">
+        <input class="li-name" value="${escapeAttr(item.name)}" oninput="updateName(${i}, this.value)">
+      </div>
+      <div class="li-amount">
+        <input type="number" value="${item.amount || ''}" placeholder="0" oninput="updateAmount(${i}, this.value)">
+      </div>
+      ${!item.fixed ? `<div class="li-remove" onclick="removeItem(${i})">✕</div>` : '<div style="width:20px"></div>'}
+    </div>
+  `).join('');
+}
+
+function escapeAttr(s) { return String(s).replace(/"/g, '&quot;'); }
+function escapeHtml(s) { if(s==null) return ''; return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+function toggleItem(i) { lineItems[i].show = !lineItems[i].show; renderLineItems(); render(); }
+function updateName(i, v) { lineItems[i].name = v; render(); }
+function updateAmount(i, v) { lineItems[i].amount = parseFloat(v) || 0; render(); }
+function removeItem(i) { lineItems.splice(i, 1); renderLineItems(); render(); }
+function addLineItem() {
+  lineItems.push({ name: 'New Item', amount: 0, show: true, fixed: false });
+  renderLineItems();
+  render();
+}
+
+function genDocNumber() {
+  // Auto-generate: KG-2026-XXX based on stored counter
+  let counter = parseInt(localStorage.getItem('kg_doc_counter') || '0');
+  return `KG-${new Date().getFullYear()}-${String(counter + 1).padStart(3, '0')}`;
+}
+
+let currentDocNumber = genDocNumber();
+
+function render() {
+  const custName = document.getElementById('custName').value || '—';
+  const custPhone = document.getElementById('custPhone').value || '';
+  const custEmail = document.getElementById('custEmail').value || '';
+  const dateVal = document.getElementById('docDate').value;
+  const dateFmt = dateVal ? new Date(dateVal).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' }) : '—';
+  const vehName = document.getElementById('vehName').value || 'Vehicle';
+  const vehYear = document.getElementById('vehYear').value || '';
+  const vehSpecs = document.getElementById('vehSpecs').value || '';
+
+  const activeItems = lineItems.filter(it => it.show);
+  const total = activeItems.reduce((sum, it) => sum + (it.amount || 0), 0);
+
+  const isInvoice = mode === 'invoice';
+  const docLabel = isInvoice ? 'INVOICE' : 'QUOTATION';
+  const validityNote = isInvoice
+    ? 'Payment due within 14 days of invoice date. Vehicle will be released upon full payment.'
+    : 'This quotation is valid for 7 days from the date above. Prices are subject to change based on exchange rates and stock availability.';
+
+  const bankBlock = isInvoice ? `
+    <div class="doc-bank">
+      <div class="blabel">Payment Details</div>
+      <strong>Kansai Group Malaysia Sdn. Bhd.</strong><br>
+      Bank: [ADD YOUR BANK NAME]<br>
+      Account No: [ADD ACCOUNT NUMBER]<br>
+      Reference: ${currentDocNumber}
+    </div>
+  ` : '';
+
+  document.getElementById('document').innerHTML = `
+    <div class="doc-head">
+      <div class="doc-logo-row">
+        <div class="doc-mark">KG</div>
+        <div>
+          <div class="doc-company">KANSAI GROUP</div>
+          <div class="doc-company-sub">Malaysia Sdn. Bhd.</div>
+        </div>
+      </div>
+      <div class="doc-type">
+        <div class="doc-type-label">${docLabel}</div>
+        <div class="doc-number">${currentDocNumber}</div>
+      </div>
+    </div>
+
+    <div class="doc-meta">
+      <div class="doc-meta-block">
+        <div class="mlabel">${isInvoice ? 'Bill To' : 'Prepared For'}</div>
+        <div class="mval-big">${escapeHtml(custName)}</div>
+        ${custPhone ? `<div class="mval">${escapeHtml(custPhone)}</div>` : ''}
+        ${custEmail ? `<div>${escapeHtml(custEmail)}</div>` : ''}
+      </div>
+      <div class="doc-meta-block" style="text-align:right;">
+        <div class="mlabel">Date</div>
+        <div class="mval">${dateFmt}</div>
+        <div class="mlabel" style="margin-top:10px;">From</div>
+        <div class="mval">Kansai Group Malaysia</div>
+        <div style="color:var(--text-muted);">3 Towers, Jalan Ampang, KL</div>
+      </div>
+    </div>
+
+    <div class="doc-vehicle">
+      <div class="vlabel">Vehicle</div>
+      <div class="vname">${escapeHtml(vehName)}${vehYear ? ' · ' + escapeHtml(vehYear) : ''}</div>
+      ${vehSpecs ? `<div class="vspecs">${escapeHtml(vehSpecs)}</div>` : ''}
+    </div>
+
+    <table class="doc-table">
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th class="right">Amount (RM)</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${activeItems.map(it => `
+          <tr>
+            <td class="item-desc">${escapeHtml(it.name)}</td>
+            <td class="right">${(it.amount || 0).toLocaleString('en-MY', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+
+    <div class="doc-total-row">
+      <div class="doc-total-box">
+        <div class="doc-grand">
+          <span class="glabel">Total ${isInvoice ? 'Due' : 'Price'}</span>
+          <span class="gval"><span class="cur">RM</span> ${total.toLocaleString('en-MY', {minimumFractionDigits:2, maximumFractionDigits:2})}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="doc-footer">
+      ${bankBlock}
+      <div class="doc-notes">
+        <strong>Terms:</strong> ${validityNote}<br>
+        All vehicles are sourced directly from Japan with full auction grade sheets. Registration and road tax subject to JPJ processing.
+      </div>
+      <div class="doc-sign">
+        <div class="doc-sign-block">
+          <div style="height:36px;"></div>
+          <div class="doc-sign-line">Authorised Signature — Kansai Group</div>
+        </div>
+        <div class="doc-sign-block">
+          <div style="height:36px;"></div>
+          <div class="doc-sign-line">Customer Acceptance</div>
+        </div>
+      </div>
+      <div class="doc-contact">
+        Kansai Group Malaysia Sdn. Bhd. · SSM Reg: 202601018333 · +60 11-5117 7026 · sales@kansaigroupcorp.com · kansaigroup.my
+      </div>
+    </div>
+  `;
+}
+
+async function downloadPDF() {
+  const { jsPDF } = window.jspdf;
+  const docEl = document.getElementById('document');
+
+  // Increment and save doc counter on download
+  let counter = parseInt(localStorage.getItem('kg_doc_counter') || '0') + 1;
+  localStorage.setItem('kg_doc_counter', counter);
+
+  const canvas = await html2canvas(docEl, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
+  const imgData = canvas.toDataURL('image/jpeg', 0.95);
+
+  const pdf = new jsPDF('p', 'mm', 'a4');
+  const pageW = 210;
+  const pageH = 297;
+  const imgW = pageW;
+  const imgH = (canvas.height * imgW) / canvas.width;
+
+  let heightLeft = imgH;
+  let position = 0;
+
+  pdf.addImage(imgData, 'JPEG', 0, position, imgW, imgH);
+  heightLeft -= pageH;
+  while (heightLeft > 0) {
+    position -= pageH;
+    pdf.addPage();
+    pdf.addImage(imgData, 'JPEG', 0, position, imgW, imgH);
+    heightLeft -= pageH;
+  }
+
+  const custName = (document.getElementById('custName').value || 'customer').replace(/[^a-z0-9]/gi, '_');
+  pdf.save(`${mode === 'invoice' ? 'Invoice' : 'Quotation'}_${currentDocNumber}_${custName}.pdf`);
+
+  // Generate next doc number for the next document
+  currentDocNumber = genDocNumber();
+  render();
+}
+</script>
+
+</body>
+</html>
