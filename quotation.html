@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kansai Group — Quotation & Invoice Generator</title>
+<title>Kansai Group — Sales Document Generator</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -48,9 +48,10 @@
   /* FORM PANEL */
   .panel { background:#fff; border:1px solid var(--border); border-radius:14px; padding:22px; margin-bottom:18px; }
   .panel h3 { font-family:'Rajdhani',sans-serif; font-size:15px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
-  .panel h3 .num { width:22px; height:22px; background:var(--red); color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-family:'Inter'; }
+  .panel h3 .num { width:22px; height:22px; background:var(--red); color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-family:'Inter'; flex-shrink:0; }
   .field { margin-bottom:14px; }
   .field label { font-size:11px; font-weight:600; color:var(--text-main); text-transform:uppercase; letter-spacing:0.4px; display:block; margin-bottom:6px; }
+  .field label .opt { color:var(--text-muted); font-weight:400; text-transform:none; }
   .field input, .field select, .field textarea { width:100%; padding:10px 13px; border:1px solid var(--border); border-radius:8px; font-size:14px; background:var(--bg-alt); outline:none; font-family:'Inter',sans-serif; resize:vertical; }
   .field input:focus, .field select:focus, .field textarea:focus { border-color:var(--navy); background:#fff; }
   .field-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
@@ -58,7 +59,7 @@
 
   /* MODE TOGGLE */
   .mode-toggle { display:flex; background:var(--bg-alt); border-radius:9px; padding:4px; margin-bottom:20px; }
-  .mode-btn { flex:1; padding:11px; border:none; background:none; border-radius:6px; font-family:'Rajdhani',sans-serif; font-size:14px; font-weight:700; letter-spacing:1px; text-transform:uppercase; cursor:pointer; color:var(--text-muted); transition:all 0.15s; }
+  .mode-btn { flex:1; padding:11px 4px; border:none; background:none; border-radius:6px; font-family:'Rajdhani',sans-serif; font-size:13px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; cursor:pointer; color:var(--text-muted); transition:all 0.15s; }
   .mode-btn.active { background:var(--red); color:#fff; }
 
   /* TOGGLE ROW (generic, used for bank details / status etc) */
@@ -114,7 +115,7 @@
   .doc-company { font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:2px; line-height:1; }
   .doc-company-sub { font-size:9px; letter-spacing:2px; color:var(--text-muted); text-transform:uppercase; margin-top:3px; }
   .doc-type { text-align:right; }
-  .doc-type-label { font-family:'Bebas Neue',sans-serif; font-size:40px; letter-spacing:2px; color:var(--red); line-height:1; }
+  .doc-type-label { font-family:'Bebas Neue',sans-serif; font-size:36px; letter-spacing:1.5px; color:var(--red); line-height:1; }
   .doc-number { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-muted); margin-top:4px; }
 
   .doc-meta { position:relative; z-index:2; display:flex; justify-content:space-between; margin-bottom:28px; gap:30px; }
@@ -123,12 +124,17 @@
   .doc-meta-block .mval { font-weight:600; }
   .doc-meta-block .mval-big { font-family:'Rajdhani',sans-serif; font-size:16px; font-weight:700; }
   .doc-meta-block .maddr { color:var(--text-muted); max-width:220px; }
+  .doc-meta-block .mref { color:var(--text-muted); font-size:11px; font-style:italic; margin-top:4px; }
 
   .doc-vehicle { position:relative; z-index:2; background:var(--bg-alt); border-radius:8px; padding:16px 18px; margin-bottom:24px; }
   .doc-vehicle .vlabel { font-size:9px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
   .doc-vehicle .vname { font-family:'Rajdhani',sans-serif; font-size:20px; font-weight:700; }
-  .doc-vehicle .vspecs { font-size:11px; color:var(--text-muted); margin-top:2px; }
-  .doc-vehicle .vchassis { font-size:11px; color:var(--text-muted); margin-top:2px; font-family:'JetBrains Mono',monospace; }
+  .doc-vehicle-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:12px; }
+  .doc-vehicle-chip { background:#fff; border:1px solid var(--border); border-radius:6px; padding:8px 10px; }
+  .doc-vehicle-chip.full { grid-column:1 / -1; }
+  .doc-vehicle-chip .cklabel { font-size:8px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px; }
+  .doc-vehicle-chip .ckval { font-size:12px; font-weight:600; color:var(--navy); }
+  .doc-vehicle-chip .ckval.mono { font-family:'JetBrains Mono',monospace; }
 
   table.doc-table { position:relative; z-index:2; width:100%; border-collapse:collapse; margin-bottom:24px; }
   table.doc-table th { text-align:left; font-size:9px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; padding:10px 12px; border-bottom:2px solid var(--navy); }
@@ -136,6 +142,7 @@
   table.doc-table td { padding:12px; font-size:13px; border-bottom:1px solid var(--border); }
   table.doc-table td.right { text-align:right; font-family:'JetBrains Mono',monospace; font-weight:500; }
   table.doc-table .item-desc { font-weight:500; }
+  table.doc-table tfoot td { border-bottom:none; border-top:2px solid var(--navy); font-weight:700; }
 
   .doc-total-row { position:relative; z-index:2; display:flex; justify-content:flex-end; }
   .doc-total-box { width:280px; }
@@ -149,7 +156,7 @@
   .doc-notes { font-size:11px; color:var(--text-muted); line-height:1.7; margin-bottom:16px; }
   .doc-notes strong { color:var(--navy); }
 
-  /* PAYMENT CARD — clean, matches doc's white/navy/red palette, no fills or icons */
+  /* INFO CARD — used for Payment Details (quote/invoice) and Financial Details (PO); clean, no fills or icons */
   .doc-bank { border:1px solid var(--border); border-left:3px solid var(--red); background:#fff; border-radius:8px; padding:16px 18px; margin-bottom:18px; }
   .doc-bank .blabel { font-size:9px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; }
   .doc-bank .bgrid { display:grid; grid-template-columns:1fr 1fr; gap:10px 20px; }
@@ -158,6 +165,11 @@
   .doc-bank .brow .bval { font-weight:600; color:var(--navy); }
   .doc-bank .brow.full { grid-column:1 / -1; }
   .doc-bank .bval.mono-acc { font-family:'JetBrains Mono',monospace; font-size:14px; letter-spacing:0.5px; }
+
+  .doc-internal-tag { font-size:9px; font-weight:700; color:var(--red); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px; }
+
+  .doc-remarks { background:var(--bg-alt); border-radius:8px; padding:14px 16px; font-size:12px; color:var(--text-main); white-space:pre-wrap; line-height:1.65; margin-bottom:20px; }
+  .doc-remarks .rlabel { font-size:9px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; display:block; }
 
   .doc-sign { display:flex; justify-content:space-between; margin-top:36px; gap:40px; }
   .doc-sign-block { flex:1; position:relative; }
@@ -177,7 +189,7 @@
 <div class="gate" id="gate">
   <div class="gate-box">
     <div class="gate-mark">KG</div>
-    <div class="gate-title bebas">Quotation Generator</div>
+    <div class="gate-title bebas">Sales Document Generator</div>
     <div class="gate-sub">Staff access only</div>
     <input type="password" id="gatePw" placeholder="Enter password" onkeydown="if(event.key==='Enter')checkGate()">
     <button onclick="checkGate()">Unlock</button>
@@ -192,7 +204,7 @@
       <div class="brand-mark">KG</div>
       <div class="brand-text">
         <div class="t">KANSAI GROUP</div>
-        <div class="s">Quotation & Invoice Generator</div>
+        <div class="s">Sales Document Generator</div>
       </div>
     </div>
   </div>
@@ -203,9 +215,10 @@
       <div class="mode-toggle">
         <button class="mode-btn active" id="modeQuote" onclick="setMode('quotation')">Quotation</button>
         <button class="mode-btn" id="modeInvoice" onclick="setMode('invoice')">Invoice</button>
+        <button class="mode-btn" id="modePO" onclick="setMode('po')">Purchase Order</button>
       </div>
 
-      <div class="panel">
+      <div class="panel" id="panelCustomer">
         <h3><span class="num">1</span> Customer Details</h3>
         <div class="field">
           <label>Customer Name</label>
@@ -222,16 +235,20 @@
           </div>
         </div>
         <div class="field">
-          <label>Email <span style="color:var(--text-muted);font-weight:400;text-transform:none;">(optional)</span></label>
+          <label>Email <span class="opt">(optional)</span></label>
           <input type="text" id="custEmail" placeholder="email@example.com" oninput="render()">
         </div>
         <div class="field">
-          <label>Address <span style="color:var(--text-muted);font-weight:400;text-transform:none;">(optional)</span></label>
+          <label>Address <span class="opt">(optional)</span></label>
           <textarea id="custAddress" rows="2" placeholder="No. 12, Jalan..., 50000 Kuala Lumpur" oninput="render()"></textarea>
+        </div>
+        <div class="field">
+          <label>Referred By / Sub-Broker <span class="opt">(optional)</span></label>
+          <input type="text" id="custRef" placeholder="Name of referring agent or sub-broker, if any" oninput="render()">
         </div>
       </div>
 
-      <div class="panel">
+      <div class="panel" id="panelVehicle">
         <h3><span class="num">2</span> Vehicle</h3>
         <div class="field">
           <label>Vehicle Name</label>
@@ -243,23 +260,52 @@
             <input type="text" id="vehYear" placeholder="2023" oninput="render()">
           </div>
           <div class="field">
-            <label>Grade / Mileage</label>
-            <input type="text" id="vehSpecs" placeholder="Grade 5.0 · 8,200km" oninput="render()">
+            <label>Colour</label>
+            <input type="text" id="vehColour" placeholder="e.g. Pearl White" oninput="render()">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Grade</label>
+            <input type="text" id="vehSpecs" placeholder="e.g. Grade 5.0" oninput="render()">
+          </div>
+          <div class="field">
+            <label>Mileage</label>
+            <input type="text" id="vehMileage" placeholder="e.g. 8,200 km" oninput="render()">
           </div>
         </div>
         <div class="field">
-          <label>Chassis Number <span style="color:var(--text-muted);font-weight:400;text-transform:none;">(optional)</span></label>
+          <label>Chassis Number <span class="opt">(optional)</span></label>
           <input type="text" id="vehChassis" placeholder="e.g. AGH30-0123456" oninput="render()">
         </div>
       </div>
 
-      <div class="panel">
+      <div class="panel" id="panelLineItems">
         <h3><span class="num">3</span> Line Items</h3>
         <div id="lineItems"></div>
         <button class="add-item-btn" onclick="addLineItem()">+ Add Custom Item</button>
       </div>
 
-      <div class="panel">
+      <div class="panel" id="panelPricingPO">
+        <h3><span class="num">3</span> Pricing & Financial Breakdown</h3>
+        <div class="field">
+          <label>Base Price (RM)</label>
+          <input type="number" id="poBasePrice" placeholder="0" oninput="render()">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>SA Commission (RM)</label>
+            <input type="number" id="poSaCommission" placeholder="0" oninput="render()">
+          </div>
+          <div class="field">
+            <label>Broker Commission (RM)</label>
+            <input type="number" id="poBrokerCommission" placeholder="0" oninput="render()">
+          </div>
+        </div>
+        <div class="field-hint">Internal figures only — this section is not shown on Quotations or Invoices.</div>
+      </div>
+
+      <div class="panel" id="panelPayment">
         <h3><span class="num">4</span> Payment Details</h3>
         <div class="toggle-row">
           <div>
@@ -271,10 +317,62 @@
         <div class="field-hint" style="margin-top:6px;">Bank details are fixed in the tool code — ask Claude to update them here if the account changes.</div>
       </div>
 
-      <div class="panel">
+      <div class="panel" id="panelFinancialPO">
+        <h3><span class="num">4</span> Financial Details</h3>
+        <div class="field">
+          <label>Source of Customer</label>
+          <select id="poSource" onchange="render()">
+            <option value="Walk-in">Walk-in</option>
+            <option value="Referral">Referral</option>
+            <option value="Sub-Broker">Sub-Broker</option>
+            <option value="Online Enquiry">Online Enquiry</option>
+            <option value="Auction Partner">Auction Partner</option>
+            <option value="Repeat Customer">Repeat Customer</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Loan Amount (RM) <span class="opt">(optional)</span></label>
+            <input type="number" id="poLoanAmount" placeholder="0" oninput="render()">
+          </div>
+          <div class="field">
+            <label>Loan Tenure <span class="opt">(optional)</span></label>
+            <input type="text" id="poLoanTenure" placeholder="e.g. 7 years" oninput="render()">
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" id="panelRemarksPO">
+        <h3><span class="num">5</span> Remarks</h3>
+        <div class="field">
+          <label>Comments / Remarks <span class="opt">(optional)</span></label>
+          <textarea id="poRemarks" rows="3" placeholder="Any internal notes about this deal..." oninput="render()"></textarea>
+        </div>
+      </div>
+
+      <div class="panel" id="panelSignoffPO">
+        <h3><span class="num">6</span> Sign-Off</h3>
+        <div class="field">
+          <label>Sales Advisor Name</label>
+          <input type="text" id="poSalesAdvisor" placeholder="e.g. Ahmad Faris" oninput="render()">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Management Approval By <span class="opt">(optional)</span></label>
+            <input type="text" id="poApprover" placeholder="e.g. Nurul, Ops Manager" oninput="render()">
+          </div>
+          <div class="field">
+            <label>Approval Date <span class="opt">(optional)</span></label>
+            <input type="date" id="poApprovalDate" oninput="render()">
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" id="panelStampStatus">
         <h3><span class="num">5</span> Stamp & Status</h3>
         <div class="field">
-          <label>Company Stamp / Signature <span style="color:var(--text-muted);font-weight:400;text-transform:none;">(optional)</span></label>
+          <label>Company Stamp / Signature <span class="opt">(optional)</span></label>
           <div class="stamp-upload">
             <div id="stampPreviewWrap" style="display:none;"><img id="stampPreview" src=""></div>
             <label class="pick" for="stampFile">Upload Image</label>
@@ -334,6 +432,34 @@ let lineItems = [
   { name: 'Handling & Documentation', amount: 0, show: true, fixed: true },
 ];
 
+// Panels shown per mode, in display order. Numbers on each panel's badge are assigned dynamically.
+const PANEL_DEFS = [
+  { id: 'panelCustomer',   modes: ['quotation', 'invoice', 'po'] },
+  { id: 'panelVehicle',    modes: ['quotation', 'invoice', 'po'] },
+  { id: 'panelLineItems',  modes: ['quotation', 'invoice'] },
+  { id: 'panelPricingPO',  modes: ['po'] },
+  { id: 'panelPayment',    modes: ['quotation', 'invoice'] },
+  { id: 'panelFinancialPO',modes: ['po'] },
+  { id: 'panelRemarksPO',  modes: ['po'] },
+  { id: 'panelSignoffPO',  modes: ['po'] },
+  { id: 'panelStampStatus',modes: ['quotation', 'invoice', 'po'] },
+];
+
+function updatePanels(m) {
+  let n = 1;
+  PANEL_DEFS.forEach(p => {
+    const el = document.getElementById(p.id);
+    if (!el) return;
+    if (p.modes.includes(m)) {
+      el.style.display = 'block';
+      const numEl = el.querySelector('.num');
+      if (numEl) numEl.textContent = n++;
+    } else {
+      el.style.display = 'none';
+    }
+  });
+}
+
 function checkGate() {
   const pw = document.getElementById('gatePw').value;
   if (pw === PASSWORD) {
@@ -341,6 +467,7 @@ function checkGate() {
     document.getElementById('app').style.display = 'block';
     initDate();
     renderLineItems();
+    updatePanels(mode);
     render();
   } else {
     document.getElementById('gateError').style.display = 'block';
@@ -356,9 +483,12 @@ function setMode(m) {
   mode = m;
   document.getElementById('modeQuote').classList.toggle('active', m === 'quotation');
   document.getElementById('modeInvoice').classList.toggle('active', m === 'invoice');
-  // sensible default: bank details on for invoice, off for quotation — user can still override
+  document.getElementById('modePO').classList.toggle('active', m === 'po');
+  // sensible default: bank details on for invoice, off for quotation/po — user can still override
   showBank = (m === 'invoice');
   document.getElementById('bankSwitch').classList.toggle('on', showBank);
+  updatePanels(m);
+  currentDocNumber = genDocNumber(m);
   render();
 }
 
@@ -410,6 +540,8 @@ function renderLineItems() {
 
 function escapeAttr(s) { return String(s).replace(/"/g, '&quot;'); }
 function escapeHtml(s) { if(s==null) return ''; return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function fmtMoney(n) { return (n || 0).toLocaleString('en-MY', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+function fmtDate(v) { return v ? new Date(v).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' }) : ''; }
 
 function toggleItem(i) { lineItems[i].show = !lineItems[i].show; renderLineItems(); render(); }
 function updateName(i, v) { lineItems[i].name = v; render(); }
@@ -421,13 +553,16 @@ function addLineItem() {
   render();
 }
 
-function genDocNumber() {
-  // Auto-generate: KG-2026-XXX based on stored counter
-  let counter = parseInt(localStorage.getItem('kg_doc_counter') || '0');
-  return `KG-${new Date().getFullYear()}-${String(counter + 1).padStart(3, '0')}`;
+function modePrefix(m) { return m === 'invoice' ? 'INV' : m === 'po' ? 'PO' : 'QUO'; }
+
+function genDocNumber(m) {
+  // Auto-generate per document type: KG-{PREFIX}-{year}-XXX, each type keeps its own counter
+  const key = 'kg_doc_counter_' + m;
+  let counter = parseInt(localStorage.getItem(key) || '0');
+  return `KG-${modePrefix(m)}-${new Date().getFullYear()}-${String(counter + 1).padStart(3, '0')}`;
 }
 
-let currentDocNumber = genDocNumber();
+let currentDocNumber = genDocNumber(mode);
 
 function watermarkColor(status) {
   if (status === 'paid') return '#16A34A';
@@ -436,31 +571,125 @@ function watermarkColor(status) {
   return '#000000';
 }
 
+// Builds the vehicle info box shared by all three document types.
+// Empty fields are simply omitted rather than shown blank.
+function buildVehicleBlock(vehName, vehYear, vehColour, vehSpecs, vehMileage, vehChassis) {
+  const chips = [];
+  if (vehYear) chips.push({ label: 'Year', val: vehYear });
+  if (vehColour) chips.push({ label: 'Colour', val: vehColour });
+  if (vehSpecs) chips.push({ label: 'Grade', val: vehSpecs });
+  if (vehMileage) chips.push({ label: 'Mileage', val: vehMileage });
+
+  const chipsHtml = chips.length ? `
+    <div class="doc-vehicle-grid">
+      ${chips.map(c => `
+        <div class="doc-vehicle-chip">
+          <div class="cklabel">${escapeHtml(c.label)}</div>
+          <div class="ckval">${escapeHtml(c.val)}</div>
+        </div>
+      `).join('')}
+      ${vehChassis ? `
+        <div class="doc-vehicle-chip full">
+          <div class="cklabel">Chassis Number</div>
+          <div class="ckval mono">${escapeHtml(vehChassis)}</div>
+        </div>
+      ` : ''}
+    </div>
+  ` : (vehChassis ? `
+    <div class="doc-vehicle-grid">
+      <div class="doc-vehicle-chip full">
+        <div class="cklabel">Chassis Number</div>
+        <div class="ckval mono">${escapeHtml(vehChassis)}</div>
+      </div>
+    </div>
+  ` : '');
+
+  return `
+    <div class="doc-vehicle">
+      <div class="vlabel">Vehicle</div>
+      <div class="vname">${escapeHtml(vehName)}</div>
+      ${chipsHtml}
+    </div>
+  `;
+}
+
+// Builds the customer-side meta block shared across document types.
+function buildCustomerMeta(label, custName, custPhone, custEmail, custAddress, custRef) {
+  return `
+    <div class="doc-meta-block">
+      <div class="mlabel">${escapeHtml(label)}</div>
+      <div class="mval-big">${escapeHtml(custName)}</div>
+      ${custPhone ? `<div class="mval">${escapeHtml(custPhone)}</div>` : ''}
+      ${custEmail ? `<div>${escapeHtml(custEmail)}</div>` : ''}
+      ${custAddress ? `<div class="maddr">${escapeHtml(custAddress)}</div>` : ''}
+      ${custRef ? `<div class="mref">Referred by: ${escapeHtml(custRef)}</div>` : ''}
+    </div>
+  `;
+}
+
+function readCommonFields() {
+  return {
+    custName: document.getElementById('custName').value || '—',
+    custPhone: document.getElementById('custPhone').value || '',
+    custEmail: document.getElementById('custEmail').value || '',
+    custAddress: document.getElementById('custAddress').value || '',
+    custRef: document.getElementById('custRef').value || '',
+    dateVal: document.getElementById('docDate').value,
+    vehName: document.getElementById('vehName').value || 'Vehicle',
+    vehYear: document.getElementById('vehYear').value || '',
+    vehColour: document.getElementById('vehColour').value || '',
+    vehSpecs: document.getElementById('vehSpecs').value || '',
+    vehMileage: document.getElementById('vehMileage').value || '',
+    vehChassis: document.getElementById('vehChassis').value || '',
+    docStatus: document.getElementById('docStatus').value
+  };
+}
+
+function buildWatermark(docStatus) {
+  return docStatus !== 'none'
+    ? `<div class="doc-watermark" style="color:${watermarkColor(docStatus)};">${docStatus.toUpperCase()}</div>`
+    : '';
+}
+
+function buildHead(docLabel) {
+  return `
+    <div class="doc-head">
+      <div class="doc-logo-row">
+        <div class="doc-mark">KG</div>
+        <div>
+          <div class="doc-company">KANSAI GROUP</div>
+          <div class="doc-company-sub">Malaysia Sdn. Bhd.</div>
+        </div>
+      </div>
+      <div class="doc-type">
+        <div class="doc-type-label">${docLabel}</div>
+        <div class="doc-number">${currentDocNumber}</div>
+      </div>
+    </div>
+  `;
+}
+
+function buildContactFooter() {
+  return `
+    <div class="doc-contact">
+      Kansai Group Malaysia Sdn. Bhd. · SSM Reg: 202601018333 · +60 11-5117 7026 · sales@kansaigroupcorp.com · kansaigroup.my
+    </div>
+  `;
+}
+
 function render() {
-  const custName = document.getElementById('custName').value || '—';
-  const custPhone = document.getElementById('custPhone').value || '';
-  const custEmail = document.getElementById('custEmail').value || '';
-  const custAddress = document.getElementById('custAddress').value || '';
-  const dateVal = document.getElementById('docDate').value;
-  const dateFmt = dateVal ? new Date(dateVal).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' }) : '—';
-  const vehName = document.getElementById('vehName').value || 'Vehicle';
-  const vehYear = document.getElementById('vehYear').value || '';
-  const vehSpecs = document.getElementById('vehSpecs').value || '';
-  const vehChassis = document.getElementById('vehChassis').value || '';
-  const docStatus = document.getElementById('docStatus').value;
+  if (mode === 'po') { renderPO(); return; }
 
-  const activeItems = lineItems.filter(it => it.show);
-  const total = activeItems.reduce((sum, it) => sum + (it.amount || 0), 0);
-
+  const f = readCommonFields();
+  const dateFmt = fmtDate(f.dateVal) || '—';
   const isInvoice = mode === 'invoice';
   const docLabel = isInvoice ? 'INVOICE' : 'QUOTATION';
   const validityNote = isInvoice
     ? 'Payment due within 14 days of invoice date. Vehicle will be released upon full payment.'
     : 'This quotation is valid for 7 days from the date above. Prices are subject to change based on exchange rates and stock availability.';
 
-  const watermarkHtml = docStatus !== 'none'
-    ? `<div class="doc-watermark" style="color:${watermarkColor(docStatus)};">${docStatus.toUpperCase()}</div>`
-    : '';
+  const activeItems = lineItems.filter(it => it.show);
+  const total = activeItems.reduce((sum, it) => sum + (it.amount || 0), 0);
 
   const bankBlock = showBank ? `
     <div class="doc-bank">
@@ -477,29 +706,11 @@ function render() {
   ` : '';
 
   document.getElementById('document').innerHTML = `
-    ${watermarkHtml}
-    <div class="doc-head">
-      <div class="doc-logo-row">
-        <div class="doc-mark">KG</div>
-        <div>
-          <div class="doc-company">KANSAI GROUP</div>
-          <div class="doc-company-sub">Malaysia Sdn. Bhd.</div>
-        </div>
-      </div>
-      <div class="doc-type">
-        <div class="doc-type-label">${docLabel}</div>
-        <div class="doc-number">${currentDocNumber}</div>
-      </div>
-    </div>
+    ${buildWatermark(f.docStatus)}
+    ${buildHead(docLabel)}
 
     <div class="doc-meta">
-      <div class="doc-meta-block">
-        <div class="mlabel">${isInvoice ? 'Bill To' : 'Prepared For'}</div>
-        <div class="mval-big">${escapeHtml(custName)}</div>
-        ${custPhone ? `<div class="mval">${escapeHtml(custPhone)}</div>` : ''}
-        ${custEmail ? `<div>${escapeHtml(custEmail)}</div>` : ''}
-        ${custAddress ? `<div class="maddr">${escapeHtml(custAddress)}</div>` : ''}
-      </div>
+      ${buildCustomerMeta(isInvoice ? 'Bill To' : 'Prepared For', f.custName, f.custPhone, f.custEmail, f.custAddress, f.custRef)}
       <div class="doc-meta-block" style="text-align:right;">
         <div class="mlabel">Date</div>
         <div class="mval">${dateFmt}</div>
@@ -509,12 +720,7 @@ function render() {
       </div>
     </div>
 
-    <div class="doc-vehicle">
-      <div class="vlabel">Vehicle</div>
-      <div class="vname">${escapeHtml(vehName)}${vehYear ? ' · ' + escapeHtml(vehYear) : ''}</div>
-      ${vehSpecs ? `<div class="vspecs">${escapeHtml(vehSpecs)}</div>` : ''}
-      ${vehChassis ? `<div class="vchassis">Chassis No: ${escapeHtml(vehChassis)}</div>` : ''}
-    </div>
+    ${buildVehicleBlock(f.vehName, f.vehYear, f.vehColour, f.vehSpecs, f.vehMileage, f.vehChassis)}
 
     <table class="doc-table">
       <thead>
@@ -527,7 +733,7 @@ function render() {
         ${activeItems.map(it => `
           <tr>
             <td class="item-desc">${escapeHtml(it.name)}</td>
-            <td class="right">${(it.amount || 0).toLocaleString('en-MY', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+            <td class="right">${fmtMoney(it.amount)}</td>
           </tr>
         `).join('')}
       </tbody>
@@ -537,7 +743,7 @@ function render() {
       <div class="doc-total-box">
         <div class="doc-grand">
           <span class="glabel">Total ${isInvoice ? 'Due' : 'Price'}</span>
-          <span class="gval"><span class="cur">RM</span> ${total.toLocaleString('en-MY', {minimumFractionDigits:2, maximumFractionDigits:2})}</span>
+          <span class="gval"><span class="cur">RM</span> ${fmtMoney(total)}</span>
         </div>
       </div>
     </div>
@@ -558,20 +764,110 @@ function render() {
           <div class="doc-sign-line">Customer Acceptance</div>
         </div>
       </div>
-      <div class="doc-contact">
-        Kansai Group Malaysia Sdn. Bhd. · SSM Reg: 202601018333 · +60 11-5117 7026 · sales@kansaigroupcorp.com · kansaigroup.my
-      </div>
+      ${buildContactFooter()}
     </div>
   `;
 }
+
+function renderPO() {
+  const f = readCommonFields();
+  const dateFmt = fmtDate(f.dateVal) || '—';
+
+  const basePrice = parseFloat(document.getElementById('poBasePrice').value) || 0;
+  const saCommission = parseFloat(document.getElementById('poSaCommission').value) || 0;
+  const brokerCommission = parseFloat(document.getElementById('poBrokerCommission').value) || 0;
+  const totalCommission = saCommission + brokerCommission;
+
+  const source = document.getElementById('poSource').value;
+  const loanAmount = document.getElementById('poLoanAmount').value;
+  const loanTenure = document.getElementById('poLoanTenure').value || '';
+  const remarks = document.getElementById('poRemarks').value || '';
+  const salesAdvisor = document.getElementById('poSalesAdvisor').value || '';
+  const approver = document.getElementById('poApprover').value || '';
+  const approvalDateFmt = fmtDate(document.getElementById('poApprovalDate').value);
+
+  const financialRows = [
+    `<div class="brow"><span class="bkey">Source of Customer</span><span class="bval">${escapeHtml(source)}</span></div>`
+  ];
+  if (loanAmount) financialRows.push(`<div class="brow"><span class="bkey">Loan Amount</span><span class="bval">RM ${fmtMoney(parseFloat(loanAmount))}</span></div>`);
+  if (loanTenure) financialRows.push(`<div class="brow full"><span class="bkey">Loan Tenure</span><span class="bval">${escapeHtml(loanTenure)}</span></div>`);
+
+  const remarksBlock = remarks ? `
+    <div class="doc-remarks">
+      <span class="rlabel">Remarks</span>${escapeHtml(remarks)}
+    </div>
+  ` : '';
+
+  document.getElementById('document').innerHTML = `
+    ${buildWatermark(f.docStatus)}
+    ${buildHead('PURCHASE ORDER')}
+
+    <div class="doc-meta">
+      ${buildCustomerMeta('Customer', f.custName, f.custPhone, f.custEmail, f.custAddress, f.custRef)}
+      <div class="doc-meta-block" style="text-align:right;">
+        <div class="mlabel">Date</div>
+        <div class="mval">${dateFmt}</div>
+        <div class="mlabel" style="margin-top:10px;">From</div>
+        <div class="mval">Kansai Group Malaysia</div>
+        <div style="color:var(--text-muted);">3 Towers, Jalan Ampang, KL</div>
+      </div>
+    </div>
+
+    ${buildVehicleBlock(f.vehName, f.vehYear, f.vehColour, f.vehSpecs, f.vehMileage, f.vehChassis)}
+
+    <div class="doc-internal-tag">Internal Use Only — Pricing & Financial Breakdown</div>
+    <table class="doc-table">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th class="right">Amount (RM)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="item-desc">Base Price</td><td class="right">${fmtMoney(basePrice)}</td></tr>
+        <tr><td class="item-desc">SA Commission</td><td class="right">${fmtMoney(saCommission)}</td></tr>
+        <tr><td class="item-desc">Broker Commission</td><td class="right">${fmtMoney(brokerCommission)}</td></tr>
+      </tbody>
+      <tfoot>
+        <tr><td>Total Commission</td><td class="right">${fmtMoney(totalCommission)}</td></tr>
+      </tfoot>
+    </table>
+
+    <div class="doc-bank">
+      <div class="blabel">Financial Details</div>
+      <div class="bgrid">
+        ${financialRows.join('')}
+      </div>
+    </div>
+
+    ${remarksBlock}
+
+    <div class="doc-footer" style="margin-top:0; padding-top:0; border-top:none;">
+      <div class="doc-sign">
+        <div class="doc-sign-block">
+          <div style="height:36px;">${stampImageData ? `<img class="doc-stamp-img" src="${stampImageData}">` : ''}</div>
+          <div class="doc-sign-line">Authorised Sales Advisor${salesAdvisor ? ' — ' + escapeHtml(salesAdvisor) : ''}</div>
+        </div>
+        <div class="doc-sign-block">
+          <div style="height:36px;"></div>
+          <div class="doc-sign-line">Management Approval${approver ? ' — ' + escapeHtml(approver) : ''}${approvalDateFmt ? ' (' + approvalDateFmt + ')' : ''}</div>
+        </div>
+      </div>
+      ${buildContactFooter()}
+    </div>
+  `;
+}
+
+const FILENAME_LABEL = { quotation: 'Quotation', invoice: 'Invoice', po: 'PurchaseOrder' };
 
 async function downloadPDF() {
   const { jsPDF } = window.jspdf;
   const docEl = document.getElementById('document');
 
-  // Increment and save doc counter on download
-  let counter = parseInt(localStorage.getItem('kg_doc_counter') || '0') + 1;
-  localStorage.setItem('kg_doc_counter', counter);
+  // Increment and save this document type's counter on download
+  const key = 'kg_doc_counter_' + mode;
+  let counter = parseInt(localStorage.getItem(key) || '0') + 1;
+  localStorage.setItem(key, counter);
 
   const canvas = await html2canvas(docEl, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
   const imgData = canvas.toDataURL('image/jpeg', 0.95);
@@ -595,10 +891,10 @@ async function downloadPDF() {
   }
 
   const custName = (document.getElementById('custName').value || 'customer').replace(/[^a-z0-9]/gi, '_');
-  pdf.save(`${mode === 'invoice' ? 'Invoice' : 'Quotation'}_${currentDocNumber}_${custName}.pdf`);
+  pdf.save(`${FILENAME_LABEL[mode]}_${currentDocNumber}_${custName}.pdf`);
 
-  // Generate next doc number for the next document
-  currentDocNumber = genDocNumber();
+  // Generate next doc number for this document type
+  currentDocNumber = genDocNumber(mode);
   render();
 }
 </script>
