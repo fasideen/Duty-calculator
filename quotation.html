@@ -11,7 +11,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   :root {
-    --red:#E60012; --red-dark:#B3000E; --gold:#C8A23C;
+    --red:#E60012; --red-dark:#B3000E; --gold:#C8A23C; --gold-bg:#FBF6E9;
     --navy:#111827; --bg-main:#FFFFFF; --bg-alt:#F4F5F7;
     --text-main:#111827; --text-muted:#6B7280; --border:#E5E7EB; --green:#16A34A;
     --shadow-sm:0 1px 3px rgba(0,0,0,0.05); --shadow-md:0 8px 24px rgba(0,0,0,0.08);
@@ -21,7 +21,7 @@
   .bebas { font-family:'Bebas Neue',sans-serif; }
   .rajdhani { font-family:'Rajdhani',sans-serif; }
   .mono { font-family:'JetBrains Mono',monospace; }
-  input, select, button { font-family:'Inter',sans-serif; }
+  input, select, button, textarea { font-family:'Inter',sans-serif; }
 
   /* LOGIN GATE */
   .gate { position:fixed; inset:0; background:var(--bg-alt); display:flex; align-items:center; justify-content:center; padding:20px; z-index:100; }
@@ -51,20 +51,26 @@
   .panel h3 .num { width:22px; height:22px; background:var(--red); color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-family:'Inter'; }
   .field { margin-bottom:14px; }
   .field label { font-size:11px; font-weight:600; color:var(--text-main); text-transform:uppercase; letter-spacing:0.4px; display:block; margin-bottom:6px; }
-  .field input, .field select { width:100%; padding:10px 13px; border:1px solid var(--border); border-radius:8px; font-size:14px; background:var(--bg-alt); outline:none; }
-  .field input:focus, .field select:focus { border-color:var(--navy); background:#fff; }
+  .field input, .field select, .field textarea { width:100%; padding:10px 13px; border:1px solid var(--border); border-radius:8px; font-size:14px; background:var(--bg-alt); outline:none; font-family:'Inter',sans-serif; resize:vertical; }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color:var(--navy); background:#fff; }
   .field-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .field-hint { font-size:10.5px; color:var(--text-muted); margin-top:5px; }
 
   /* MODE TOGGLE */
   .mode-toggle { display:flex; background:var(--bg-alt); border-radius:9px; padding:4px; margin-bottom:20px; }
   .mode-btn { flex:1; padding:11px; border:none; background:none; border-radius:6px; font-family:'Rajdhani',sans-serif; font-size:14px; font-weight:700; letter-spacing:1px; text-transform:uppercase; cursor:pointer; color:var(--text-muted); transition:all 0.15s; }
   .mode-btn.active { background:var(--red); color:#fff; }
 
+  /* TOGGLE ROW (generic, used for bank details / status etc) */
+  .toggle-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; }
+  .toggle-row .tr-label { font-size:13px; font-weight:500; }
+  .toggle-row .tr-sub { font-size:11px; color:var(--text-muted); margin-top:2px; }
+
   /* LINE ITEMS */
   .line-item { display:flex; align-items:center; gap:10px; padding:11px 0; border-bottom:1px solid var(--border); }
   .line-item:last-child { border-bottom:none; }
   .li-toggle { flex-shrink:0; }
-  .switch { width:40px; height:23px; background:var(--border); border-radius:20px; position:relative; cursor:pointer; transition:background 0.2s; }
+  .switch { width:40px; height:23px; background:var(--border); border-radius:20px; position:relative; cursor:pointer; transition:background 0.2s; flex-shrink:0; }
   .switch.on { background:var(--green); }
   .switch::after { content:''; position:absolute; top:3px; left:3px; width:17px; height:17px; background:#fff; border-radius:50%; transition:transform 0.2s; box-shadow:0 1px 2px rgba(0,0,0,0.2); }
   .switch.on::after { transform:translateX(17px); }
@@ -78,6 +84,14 @@
   .add-item-btn { width:100%; padding:11px; border:1px dashed var(--border); background:none; border-radius:8px; color:var(--text-muted); font-size:12.5px; font-weight:600; cursor:pointer; margin-top:12px; font-family:'Rajdhani',sans-serif; letter-spacing:0.5px; text-transform:uppercase; }
   .add-item-btn:hover { border-color:var(--red); color:var(--red); }
 
+  /* STAMP UPLOAD */
+  .stamp-upload { border:1px dashed var(--border); border-radius:10px; padding:16px; text-align:center; }
+  .stamp-upload img { max-height:70px; max-width:100%; margin-bottom:10px; }
+  .stamp-upload input[type=file] { display:none; }
+  .stamp-upload label.pick { display:inline-block; background:var(--bg-alt); border:1px solid var(--border); border-radius:7px; padding:8px 14px; font-size:12px; font-weight:600; cursor:pointer; }
+  .stamp-upload label.pick:hover { border-color:var(--navy); }
+  .stamp-clear { display:block; margin-top:8px; font-size:11px; color:var(--red); cursor:pointer; }
+
   .actions { display:flex; gap:10px; margin-top:8px; }
   .btn-primary { flex:1; background:var(--red); color:#fff; border:none; border-radius:9px; padding:14px; font-family:'Rajdhani',sans-serif; font-size:14px; font-weight:700; letter-spacing:1px; text-transform:uppercase; cursor:pointer; }
   .btn-primary:hover { background:var(--red-dark); }
@@ -90,8 +104,11 @@
   .doc { background:#fff; border:1px solid var(--border); border-radius:8px; box-shadow:var(--shadow-md); overflow:hidden; }
 
   /* The actual document (A4 ratio) */
-  #document { width:100%; background:#fff; padding:48px 44px; color:var(--navy); }
-  .doc-head { display:flex; justify-content:space-between; align-items:flex-start; padding-bottom:28px; border-bottom:3px solid var(--red); margin-bottom:28px; }
+  #document { width:100%; background:#fff; padding:48px 44px; color:var(--navy); position:relative; overflow:hidden; }
+
+  .doc-watermark { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) rotate(-28deg); font-family:'Bebas Neue',sans-serif; font-size:88px; letter-spacing:6px; opacity:0.10; pointer-events:none; z-index:1; white-space:nowrap; }
+
+  .doc-head { position:relative; z-index:2; display:flex; justify-content:space-between; align-items:flex-start; padding-bottom:28px; border-bottom:3px solid var(--red); margin-bottom:28px; }
   .doc-logo-row { display:flex; align-items:center; gap:12px; }
   .doc-mark { width:52px; height:52px; background:var(--red); clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%); display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:22px; color:#fff; }
   .doc-company { font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:2px; line-height:1; }
@@ -100,25 +117,27 @@
   .doc-type-label { font-family:'Bebas Neue',sans-serif; font-size:40px; letter-spacing:2px; color:var(--red); line-height:1; }
   .doc-number { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-muted); margin-top:4px; }
 
-  .doc-meta { display:flex; justify-content:space-between; margin-bottom:28px; gap:30px; }
+  .doc-meta { position:relative; z-index:2; display:flex; justify-content:space-between; margin-bottom:28px; gap:30px; }
   .doc-meta-block { font-size:12px; line-height:1.7; }
   .doc-meta-block .mlabel { font-size:9px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:5px; }
   .doc-meta-block .mval { font-weight:600; }
   .doc-meta-block .mval-big { font-family:'Rajdhani',sans-serif; font-size:16px; font-weight:700; }
+  .doc-meta-block .maddr { color:var(--text-muted); max-width:220px; }
 
-  .doc-vehicle { background:var(--bg-alt); border-radius:8px; padding:16px 18px; margin-bottom:24px; }
+  .doc-vehicle { position:relative; z-index:2; background:var(--bg-alt); border-radius:8px; padding:16px 18px; margin-bottom:24px; }
   .doc-vehicle .vlabel { font-size:9px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
   .doc-vehicle .vname { font-family:'Rajdhani',sans-serif; font-size:20px; font-weight:700; }
   .doc-vehicle .vspecs { font-size:11px; color:var(--text-muted); margin-top:2px; }
+  .doc-vehicle .vchassis { font-size:11px; color:var(--text-muted); margin-top:2px; font-family:'JetBrains Mono',monospace; }
 
-  table.doc-table { width:100%; border-collapse:collapse; margin-bottom:24px; }
+  table.doc-table { position:relative; z-index:2; width:100%; border-collapse:collapse; margin-bottom:24px; }
   table.doc-table th { text-align:left; font-size:9px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; padding:10px 12px; border-bottom:2px solid var(--navy); }
   table.doc-table th.right { text-align:right; }
   table.doc-table td { padding:12px; font-size:13px; border-bottom:1px solid var(--border); }
   table.doc-table td.right { text-align:right; font-family:'JetBrains Mono',monospace; font-weight:500; }
   table.doc-table .item-desc { font-weight:500; }
 
-  .doc-total-row { display:flex; justify-content:flex-end; }
+  .doc-total-row { position:relative; z-index:2; display:flex; justify-content:flex-end; }
   .doc-total-box { width:280px; }
   .doc-subtotal { display:flex; justify-content:space-between; padding:8px 12px; font-size:13px; color:var(--text-muted); }
   .doc-grand { display:flex; justify-content:space-between; align-items:center; padding:16px 12px; background:var(--navy); border-radius:8px; margin-top:6px; }
@@ -126,15 +145,27 @@
   .doc-grand .gval { font-family:'Bebas Neue',sans-serif; font-size:30px; color:var(--gold); letter-spacing:1px; }
   .doc-grand .gval .cur { font-size:14px; color:rgba(255,255,255,0.7); }
 
-  .doc-footer { margin-top:32px; padding-top:20px; border-top:1px solid var(--border); }
+  .doc-footer { position:relative; z-index:2; margin-top:32px; padding-top:20px; border-top:1px solid var(--border); }
   .doc-notes { font-size:11px; color:var(--text-muted); line-height:1.7; margin-bottom:16px; }
   .doc-notes strong { color:var(--navy); }
-  .doc-bank { background:var(--bg-alt); border-radius:8px; padding:14px 16px; font-size:11px; line-height:1.7; margin-bottom:16px; }
-  .doc-bank .blabel { font-size:9px; font-weight:700; color:var(--red); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+
+  /* PAYMENT CARD — made prominent per request */
+  .doc-bank { border:1.5px solid var(--gold); background:var(--gold-bg); border-radius:10px; padding:16px 18px; margin-bottom:18px; }
+  .doc-bank .blabel-row { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+  .doc-bank .bicon { width:22px; height:22px; background:var(--gold); border-radius:5px; display:flex; align-items:center; justify-content:center; font-size:12px; color:#fff; flex-shrink:0; }
+  .doc-bank .blabel { font-family:'Rajdhani',sans-serif; font-size:13px; font-weight:700; color:var(--navy); text-transform:uppercase; letter-spacing:1px; }
+  .doc-bank .bgrid { display:grid; grid-template-columns:1fr 1fr; gap:8px 20px; }
+  .doc-bank .brow { font-size:12px; line-height:1.5; }
+  .doc-bank .brow .bkey { font-size:9px; font-weight:700; color:#8a7333; text-transform:uppercase; letter-spacing:0.5px; display:block; }
+  .doc-bank .brow .bval { font-weight:600; color:var(--navy); }
+  .doc-bank .brow.full { grid-column:1 / -1; }
+  .doc-bank .bval.mono-acc { font-family:'JetBrains Mono',monospace; font-size:14px; letter-spacing:0.5px; }
+
   .doc-sign { display:flex; justify-content:space-between; margin-top:36px; gap:40px; }
-  .doc-sign-block { flex:1; }
+  .doc-sign-block { flex:1; position:relative; }
   .doc-sign-line { border-top:1px solid var(--navy); padding-top:6px; font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; }
-  .doc-contact { text-align:center; margin-top:28px; font-size:10px; color:var(--text-muted); letter-spacing:0.3px; }
+  .doc-stamp-img { position:absolute; bottom:14px; left:10px; max-height:64px; max-width:150px; transform:rotate(-6deg); opacity:0.92; }
+  .doc-contact { text-align:center; margin-top:28px; font-size:10px; color:var(--text-muted); letter-spacing:0.3px; position:relative; z-index:2; }
 
   @media (max-width:960px) {
     .grid { grid-template-columns:1fr; }
@@ -196,6 +227,10 @@
           <label>Email <span style="color:var(--text-muted);font-weight:400;text-transform:none;">(optional)</span></label>
           <input type="text" id="custEmail" placeholder="email@example.com" oninput="render()">
         </div>
+        <div class="field">
+          <label>Address <span style="color:var(--text-muted);font-weight:400;text-transform:none;">(optional)</span></label>
+          <textarea id="custAddress" rows="2" placeholder="No. 12, Jalan..., 50000 Kuala Lumpur" oninput="render()"></textarea>
+        </div>
       </div>
 
       <div class="panel">
@@ -214,12 +249,50 @@
             <input type="text" id="vehSpecs" placeholder="Grade 5.0 · 8,200km" oninput="render()">
           </div>
         </div>
+        <div class="field">
+          <label>Chassis Number <span style="color:var(--text-muted);font-weight:400;text-transform:none;">(optional)</span></label>
+          <input type="text" id="vehChassis" placeholder="e.g. AGH30-0123456" oninput="render()">
+        </div>
       </div>
 
       <div class="panel">
         <h3><span class="num">3</span> Line Items</h3>
         <div id="lineItems"></div>
         <button class="add-item-btn" onclick="addLineItem()">+ Add Custom Item</button>
+      </div>
+
+      <div class="panel">
+        <h3><span class="num">4</span> Payment Details</h3>
+        <div class="toggle-row">
+          <div>
+            <div class="tr-label">Show bank details on document</div>
+            <div class="tr-sub">Standard Chartered account shown below</div>
+          </div>
+          <div class="switch" id="bankSwitch" onclick="toggleBank()"></div>
+        </div>
+        <div class="field-hint" style="margin-top:6px;">Bank details are fixed in the tool code — ask Claude to update them here if the account changes.</div>
+      </div>
+
+      <div class="panel">
+        <h3><span class="num">5</span> Stamp & Status</h3>
+        <div class="field">
+          <label>Company Stamp / Signature <span style="color:var(--text-muted);font-weight:400;text-transform:none;">(optional)</span></label>
+          <div class="stamp-upload">
+            <div id="stampPreviewWrap" style="display:none;"><img id="stampPreview" src=""></div>
+            <label class="pick" for="stampFile">Upload Image</label>
+            <input type="file" id="stampFile" accept="image/*" onchange="handleStampUpload(event)">
+            <div class="stamp-clear" id="stampClearBtn" style="display:none;" onclick="clearStamp()">Remove stamp</div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Document Status</label>
+          <select id="docStatus" onchange="render()">
+            <option value="none">Final (no watermark)</option>
+            <option value="draft">Draft</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="paid">Paid</option>
+          </select>
+        </div>
       </div>
 
       <div class="actions">
@@ -241,6 +314,18 @@
 <script>
 const PASSWORD = 'kansai2026';
 let mode = 'quotation';
+let showBank = false;
+let stampImageData = null;
+
+// Fixed bank details — update here if the account ever changes
+const BANK_DETAILS = {
+  companyName: 'KANSAI GROUP (M) SDN BHD',
+  accountNo: '794409853626',
+  bankName: 'STANDARD CHARTERED BANK MALAYSIA BERHAD',
+  swift: 'SCBLMYKXXXX',
+  branch: 'PETALING JAYA BRANCH',
+  branchAddress: '30, JALAN 52/4, PJ NEW TOWN, 46050 PETALING JAYA SELANGOR'
+};
 
 // Default line items (fixed set with toggles) — customer-facing sale-side only
 let lineItems = [
@@ -273,6 +358,37 @@ function setMode(m) {
   mode = m;
   document.getElementById('modeQuote').classList.toggle('active', m === 'quotation');
   document.getElementById('modeInvoice').classList.toggle('active', m === 'invoice');
+  // sensible default: bank details on for invoice, off for quotation — user can still override
+  showBank = (m === 'invoice');
+  document.getElementById('bankSwitch').classList.toggle('on', showBank);
+  render();
+}
+
+function toggleBank() {
+  showBank = !showBank;
+  document.getElementById('bankSwitch').classList.toggle('on', showBank);
+  render();
+}
+
+function handleStampUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    stampImageData = e.target.result;
+    document.getElementById('stampPreview').src = stampImageData;
+    document.getElementById('stampPreviewWrap').style.display = 'block';
+    document.getElementById('stampClearBtn').style.display = 'block';
+    render();
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearStamp() {
+  stampImageData = null;
+  document.getElementById('stampFile').value = '';
+  document.getElementById('stampPreviewWrap').style.display = 'none';
+  document.getElementById('stampClearBtn').style.display = 'none';
   render();
 }
 
@@ -315,15 +431,25 @@ function genDocNumber() {
 
 let currentDocNumber = genDocNumber();
 
+function watermarkColor(status) {
+  if (status === 'paid') return '#16A34A';
+  if (status === 'confirmed') return '#111827';
+  if (status === 'draft') return '#E60012';
+  return '#000000';
+}
+
 function render() {
   const custName = document.getElementById('custName').value || '—';
   const custPhone = document.getElementById('custPhone').value || '';
   const custEmail = document.getElementById('custEmail').value || '';
+  const custAddress = document.getElementById('custAddress').value || '';
   const dateVal = document.getElementById('docDate').value;
   const dateFmt = dateVal ? new Date(dateVal).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' }) : '—';
   const vehName = document.getElementById('vehName').value || 'Vehicle';
   const vehYear = document.getElementById('vehYear').value || '';
   const vehSpecs = document.getElementById('vehSpecs').value || '';
+  const vehChassis = document.getElementById('vehChassis').value || '';
+  const docStatus = document.getElementById('docStatus').value;
 
   const activeItems = lineItems.filter(it => it.show);
   const total = activeItems.reduce((sum, it) => sum + (it.amount || 0), 0);
@@ -334,17 +460,29 @@ function render() {
     ? 'Payment due within 14 days of invoice date. Vehicle will be released upon full payment.'
     : 'This quotation is valid for 7 days from the date above. Prices are subject to change based on exchange rates and stock availability.';
 
-  const bankBlock = isInvoice ? `
+  const watermarkHtml = docStatus !== 'none'
+    ? `<div class="doc-watermark" style="color:${watermarkColor(docStatus)};">${docStatus.toUpperCase()}</div>`
+    : '';
+
+  const bankBlock = showBank ? `
     <div class="doc-bank">
-      <div class="blabel">Payment Details</div>
-      <strong>Kansai Group Malaysia Sdn. Bhd.</strong><br>
-      Bank: [ADD YOUR BANK NAME]<br>
-      Account No: [ADD ACCOUNT NUMBER]<br>
-      Reference: ${currentDocNumber}
+      <div class="blabel-row">
+        <div class="bicon">🏦</div>
+        <div class="blabel">Payment Details</div>
+      </div>
+      <div class="bgrid">
+        <div class="brow full"><span class="bkey">Company Name</span><span class="bval">${escapeHtml(BANK_DETAILS.companyName)}</span></div>
+        <div class="brow full"><span class="bkey">MYR Account No.</span><span class="bval mono-acc">${escapeHtml(BANK_DETAILS.accountNo)}</span></div>
+        <div class="brow"><span class="bkey">Bank Name</span><span class="bval">${escapeHtml(BANK_DETAILS.bankName)}</span></div>
+        <div class="brow"><span class="bkey">SWIFT Code</span><span class="bval">${escapeHtml(BANK_DETAILS.swift)}</span></div>
+        <div class="brow full"><span class="bkey">Branch</span><span class="bval">${escapeHtml(BANK_DETAILS.branch)} — ${escapeHtml(BANK_DETAILS.branchAddress)}</span></div>
+        <div class="brow full"><span class="bkey">Payment Reference</span><span class="bval">${currentDocNumber}</span></div>
+      </div>
     </div>
   ` : '';
 
   document.getElementById('document').innerHTML = `
+    ${watermarkHtml}
     <div class="doc-head">
       <div class="doc-logo-row">
         <div class="doc-mark">KG</div>
@@ -365,6 +503,7 @@ function render() {
         <div class="mval-big">${escapeHtml(custName)}</div>
         ${custPhone ? `<div class="mval">${escapeHtml(custPhone)}</div>` : ''}
         ${custEmail ? `<div>${escapeHtml(custEmail)}</div>` : ''}
+        ${custAddress ? `<div class="maddr">${escapeHtml(custAddress)}</div>` : ''}
       </div>
       <div class="doc-meta-block" style="text-align:right;">
         <div class="mlabel">Date</div>
@@ -379,6 +518,7 @@ function render() {
       <div class="vlabel">Vehicle</div>
       <div class="vname">${escapeHtml(vehName)}${vehYear ? ' · ' + escapeHtml(vehYear) : ''}</div>
       ${vehSpecs ? `<div class="vspecs">${escapeHtml(vehSpecs)}</div>` : ''}
+      ${vehChassis ? `<div class="vchassis">Chassis No: ${escapeHtml(vehChassis)}</div>` : ''}
     </div>
 
     <table class="doc-table">
@@ -415,7 +555,7 @@ function render() {
       </div>
       <div class="doc-sign">
         <div class="doc-sign-block">
-          <div style="height:36px;"></div>
+          <div style="height:36px;">${stampImageData ? `<img class="doc-stamp-img" src="${stampImageData}">` : ''}</div>
           <div class="doc-sign-line">Authorised Signature — Kansai Group</div>
         </div>
         <div class="doc-sign-block">
