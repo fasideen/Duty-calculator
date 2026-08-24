@@ -11,7 +11,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   :root {
-    --red:#E60012; --red-dark:#B3000E; --gold:#C8A23C; --gold-bg:#FBF6E9;
+    --red:#E60012; --red-dark:#B3000E; --gold:#C8A23C;
     --navy:#111827; --bg-main:#FFFFFF; --bg-alt:#F4F5F7;
     --text-main:#111827; --text-muted:#6B7280; --border:#E5E7EB; --green:#16A34A;
     --shadow-sm:0 1px 3px rgba(0,0,0,0.05); --shadow-md:0 8px 24px rgba(0,0,0,0.08);
@@ -149,14 +149,12 @@
   .doc-notes { font-size:11px; color:var(--text-muted); line-height:1.7; margin-bottom:16px; }
   .doc-notes strong { color:var(--navy); }
 
-  /* PAYMENT CARD — made prominent per request */
-  .doc-bank { border:1.5px solid var(--gold); background:var(--gold-bg); border-radius:10px; padding:16px 18px; margin-bottom:18px; }
-  .doc-bank .blabel-row { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
-  .doc-bank .bicon { width:22px; height:22px; background:var(--gold); border-radius:5px; display:flex; align-items:center; justify-content:center; font-size:12px; color:#fff; flex-shrink:0; }
-  .doc-bank .blabel { font-family:'Rajdhani',sans-serif; font-size:13px; font-weight:700; color:var(--navy); text-transform:uppercase; letter-spacing:1px; }
-  .doc-bank .bgrid { display:grid; grid-template-columns:1fr 1fr; gap:8px 20px; }
+  /* PAYMENT CARD — clean, matches doc's white/navy/red palette, no fills or icons */
+  .doc-bank { border:1px solid var(--border); border-left:3px solid var(--red); background:#fff; border-radius:8px; padding:16px 18px; margin-bottom:18px; }
+  .doc-bank .blabel { font-size:9px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; }
+  .doc-bank .bgrid { display:grid; grid-template-columns:1fr 1fr; gap:10px 20px; }
   .doc-bank .brow { font-size:12px; line-height:1.5; }
-  .doc-bank .brow .bkey { font-size:9px; font-weight:700; color:#8a7333; text-transform:uppercase; letter-spacing:0.5px; display:block; }
+  .doc-bank .brow .bkey { font-size:9px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:2px; }
   .doc-bank .brow .bval { font-weight:600; color:var(--navy); }
   .doc-bank .brow.full { grid-column:1 / -1; }
   .doc-bank .bval.mono-acc { font-family:'JetBrains Mono',monospace; font-size:14px; letter-spacing:0.5px; }
@@ -466,10 +464,7 @@ function render() {
 
   const bankBlock = showBank ? `
     <div class="doc-bank">
-      <div class="blabel-row">
-        <div class="bicon">🏦</div>
-        <div class="blabel">Payment Details</div>
-      </div>
+      <div class="blabel">Payment Details</div>
       <div class="bgrid">
         <div class="brow full"><span class="bkey">Company Name</span><span class="bval">${escapeHtml(BANK_DETAILS.companyName)}</span></div>
         <div class="brow full"><span class="bkey">MYR Account No.</span><span class="bval mono-acc">${escapeHtml(BANK_DETAILS.accountNo)}</span></div>
