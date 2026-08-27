@@ -104,78 +104,78 @@
   .preview-label { font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:10px; }
   .doc { background:#fff; border:1px solid var(--border); border-radius:8px; box-shadow:var(--shadow-md); overflow:hidden; }
 
-  /* The actual document (A4 ratio) */
-  #document { width:100%; background:#fff; padding:48px 44px; color:var(--navy); position:relative; overflow:hidden; }
+  /* The actual document (A4 ratio) — text sizes bumped up for readability */
+  #document { width:100%; background:#fff; padding:48px 44px; color:var(--navy); position:relative; overflow:hidden; font-size:14px; }
 
   .doc-watermark { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) rotate(-28deg); font-family:'Bebas Neue',sans-serif; font-size:88px; letter-spacing:6px; opacity:0.10; pointer-events:none; z-index:1; white-space:nowrap; }
 
   .doc-head { position:relative; z-index:2; display:flex; justify-content:space-between; align-items:flex-start; padding-bottom:28px; border-bottom:3px solid var(--red); margin-bottom:28px; }
   .doc-logo-row { display:flex; align-items:center; gap:12px; }
   .doc-mark { width:52px; height:52px; background:var(--red); clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%); display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:22px; color:#fff; }
-  .doc-company { font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:2px; line-height:1; }
-  .doc-company-sub { font-size:9px; letter-spacing:2px; color:var(--text-muted); text-transform:uppercase; margin-top:3px; }
+  .doc-company { font-family:'Bebas Neue',sans-serif; font-size:27px; letter-spacing:2px; line-height:1; }
+  .doc-company-sub { font-size:10px; letter-spacing:2px; color:var(--text-muted); text-transform:uppercase; margin-top:3px; }
   .doc-type { text-align:right; }
-  .doc-type-label { font-family:'Bebas Neue',sans-serif; font-size:36px; letter-spacing:1.5px; color:var(--red); line-height:1; }
-  .doc-number { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-muted); margin-top:4px; }
+  .doc-type-label { font-family:'Bebas Neue',sans-serif; font-size:38px; letter-spacing:1.5px; color:var(--red); line-height:1; }
+  .doc-number { font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-muted); margin-top:4px; }
+
+  .doc-section-label { position:relative; z-index:2; font-size:10.5px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:10px; }
+  .doc-section-label.internal { color:var(--red); }
 
   .doc-meta { position:relative; z-index:2; display:flex; justify-content:space-between; margin-bottom:28px; gap:30px; }
-  .doc-meta-block { font-size:12px; line-height:1.7; }
-  .doc-meta-block .mlabel { font-size:9px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:5px; }
+  .doc-meta-block { font-size:13px; line-height:1.7; }
+  .doc-meta-block .mlabel { font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:5px; }
   .doc-meta-block .mval { font-weight:600; }
-  .doc-meta-block .mval-big { font-family:'Rajdhani',sans-serif; font-size:16px; font-weight:700; }
+  .doc-meta-block .mval-big { font-family:'Rajdhani',sans-serif; font-size:18px; font-weight:700; }
   .doc-meta-block .maddr { color:var(--text-muted); max-width:220px; }
-  .doc-meta-block .mref { color:var(--text-muted); font-size:11px; font-style:italic; margin-top:4px; }
+  .doc-meta-block .mref { color:var(--text-muted); font-size:12px; font-style:italic; margin-top:4px; }
 
   .doc-vehicle { position:relative; z-index:2; background:var(--bg-alt); border-radius:8px; padding:16px 18px; margin-bottom:24px; }
-  .doc-vehicle .vlabel { font-size:9px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
-  .doc-vehicle .vname { font-family:'Rajdhani',sans-serif; font-size:20px; font-weight:700; }
+  .doc-vehicle .vlabel { font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
+  .doc-vehicle .vname { font-family:'Rajdhani',sans-serif; font-size:22px; font-weight:700; }
   .doc-vehicle-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:12px; }
-  .doc-vehicle-chip { background:#fff; border:1px solid var(--border); border-radius:6px; padding:8px 10px; }
+  .doc-vehicle-chip { background:#fff; border:1px solid var(--border); border-radius:6px; padding:9px 10px; }
   .doc-vehicle-chip.full { grid-column:1 / -1; }
-  .doc-vehicle-chip .cklabel { font-size:8px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px; }
-  .doc-vehicle-chip .ckval { font-size:12px; font-weight:600; color:var(--navy); }
+  .doc-vehicle-chip .cklabel { font-size:9px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px; }
+  .doc-vehicle-chip .ckval { font-size:13px; font-weight:600; color:var(--navy); }
   .doc-vehicle-chip .ckval.mono { font-family:'JetBrains Mono',monospace; }
 
-  table.doc-table { position:relative; z-index:2; width:100%; border-collapse:collapse; margin-bottom:24px; }
-  table.doc-table th { text-align:left; font-size:9px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; padding:10px 12px; border-bottom:2px solid var(--navy); }
+  table.doc-table { position:relative; z-index:2; width:100%; border-collapse:collapse; margin-bottom:20px; }
+  table.doc-table th { text-align:left; font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; padding:10px 12px; border-bottom:2px solid var(--navy); }
   table.doc-table th.right { text-align:right; }
-  table.doc-table td { padding:12px; font-size:13px; border-bottom:1px solid var(--border); }
+  table.doc-table td { padding:12px; font-size:14px; border-bottom:1px solid var(--border); }
   table.doc-table td.right { text-align:right; font-family:'JetBrains Mono',monospace; font-weight:500; }
   table.doc-table .item-desc { font-weight:500; }
-  table.doc-table tfoot td { border-bottom:none; border-top:2px solid var(--navy); font-weight:700; }
+  table.doc-table tfoot td { border-bottom:none; border-top:2px solid var(--navy); font-weight:700; font-size:14.5px; }
 
   .doc-total-row { position:relative; z-index:2; display:flex; justify-content:flex-end; }
   .doc-total-box { width:280px; }
   .doc-subtotal { display:flex; justify-content:space-between; padding:8px 12px; font-size:13px; color:var(--text-muted); }
   .doc-grand { display:flex; justify-content:space-between; align-items:center; padding:16px 12px; background:var(--navy); border-radius:8px; margin-top:6px; }
-  .doc-grand .glabel { font-family:'Rajdhani',sans-serif; font-size:14px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:#fff; }
-  .doc-grand .gval { font-family:'Bebas Neue',sans-serif; font-size:30px; color:var(--gold); letter-spacing:1px; }
-  .doc-grand .gval .cur { font-size:14px; color:rgba(255,255,255,0.7); }
+  .doc-grand .glabel { font-family:'Rajdhani',sans-serif; font-size:15px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:#fff; }
+  .doc-grand .gval { font-family:'Bebas Neue',sans-serif; font-size:31px; color:var(--gold); letter-spacing:1px; }
+  .doc-grand .gval .cur { font-size:15px; color:rgba(255,255,255,0.7); }
 
   .doc-footer { position:relative; z-index:2; margin-top:32px; padding-top:20px; border-top:1px solid var(--border); }
-  .doc-notes { font-size:11px; color:var(--text-muted); line-height:1.7; margin-bottom:16px; }
+  .doc-notes { font-size:12px; color:var(--text-muted); line-height:1.7; margin-bottom:16px; }
   .doc-notes strong { color:var(--navy); }
 
   /* INFO CARD — used for Payment Details (quote/invoice) and Financial Details (PO); clean, no fills or icons */
-  .doc-bank { border:1px solid var(--border); border-left:3px solid var(--red); background:#fff; border-radius:8px; padding:16px 18px; margin-bottom:18px; }
-  .doc-bank .blabel { font-size:9px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; }
+  .doc-bank { border:1px solid var(--border); border-left:3px solid var(--red); background:#fff; border-radius:8px; padding:16px 18px; margin-bottom:20px; }
+  .doc-bank .blabel { font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; }
   .doc-bank .bgrid { display:grid; grid-template-columns:1fr 1fr; gap:10px 20px; }
-  .doc-bank .brow { font-size:12px; line-height:1.5; }
-  .doc-bank .brow .bkey { font-size:9px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:2px; }
+  .doc-bank .brow { font-size:13px; line-height:1.5; }
+  .doc-bank .brow .bkey { font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:2px; }
   .doc-bank .brow .bval { font-weight:600; color:var(--navy); }
   .doc-bank .brow.full { grid-column:1 / -1; }
-  .doc-bank .bval.mono-acc { font-family:'JetBrains Mono',monospace; font-size:14px; letter-spacing:0.5px; }
+  .doc-bank .bval.mono-acc { font-family:'JetBrains Mono',monospace; font-size:15px; letter-spacing:0.5px; }
 
-  .doc-internal-tag { font-size:9px; font-weight:700; color:var(--red); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px; }
+  .doc-remarks { background:var(--bg-alt); border-radius:8px; padding:14px 16px; font-size:13px; color:var(--text-main); white-space:pre-wrap; line-height:1.65; margin-bottom:20px; }
 
-  .doc-remarks { background:var(--bg-alt); border-radius:8px; padding:14px 16px; font-size:12px; color:var(--text-main); white-space:pre-wrap; line-height:1.65; margin-bottom:20px; }
-  .doc-remarks .rlabel { font-size:9px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; display:block; }
-
-  .doc-sign { display:flex; justify-content:space-between; margin-top:36px; gap:40px; }
+  .doc-sign { display:flex; justify-content:space-between; margin-top:20px; gap:40px; }
   .doc-sign-block { flex:1; position:relative; }
-  .doc-sign-line { border-top:1px solid var(--navy); padding-top:6px; font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; }
+  .doc-sign-line { border-top:1px solid var(--navy); padding-top:6px; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; }
   .doc-stamp-img { position:absolute; bottom:14px; left:10px; max-height:64px; max-width:150px; transform:rotate(-6deg); opacity:0.92; }
-  .doc-contact { text-align:center; margin-top:28px; font-size:10px; color:var(--text-muted); letter-spacing:0.3px; position:relative; z-index:2; }
+  .doc-contact { text-align:center; margin-top:28px; font-size:11px; color:var(--text-muted); letter-spacing:0.3px; position:relative; z-index:2; }
 
   @media (max-width:960px) {
     .grid { grid-template-columns:1fr; }
@@ -214,8 +214,8 @@
     <div>
       <div class="mode-toggle">
         <button class="mode-btn active" id="modeQuote" onclick="setMode('quotation')">Quotation</button>
-        <button class="mode-btn" id="modeInvoice" onclick="setMode('invoice')">Invoice</button>
         <button class="mode-btn" id="modePO" onclick="setMode('po')">Purchase Order</button>
+        <button class="mode-btn" id="modeInvoice" onclick="setMode('invoice')">Invoice</button>
       </div>
 
       <div class="panel" id="panelCustomer">
@@ -289,7 +289,36 @@
       <div class="panel" id="panelPricingPO">
         <h3><span class="num">3</span> Pricing & Financial Breakdown</h3>
         <div class="field">
-          <label>Base Price (RM)</label>
+          <label>Selling Price (RM)</label>
+          <input type="number" id="poSellingPrice" placeholder="0" oninput="render()">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Road Tax (RM)</label>
+            <input type="number" id="poRoadTax" placeholder="0" oninput="render()">
+          </div>
+          <div class="field">
+            <label>Insurance (RM)</label>
+            <input type="number" id="poInsurance" placeholder="0" oninput="render()">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Processing Fee (RM)</label>
+            <input type="number" id="poProcessingFee" placeholder="0" oninput="render()">
+          </div>
+          <div class="field">
+            <label>Interchange Fee (RM)</label>
+            <input type="number" id="poInterchangeFee" placeholder="0" oninput="render()">
+          </div>
+        </div>
+        <div class="field-hint">Total amount is calculated automatically on the document.</div>
+      </div>
+
+      <div class="panel" id="panelInternalPO">
+        <h3><span class="num">4</span> Internal Tracking & Commission</h3>
+        <div class="field">
+          <label>Base Price (MYR)</label>
           <input type="number" id="poBasePrice" placeholder="0" oninput="render()">
         </div>
         <div class="field-row">
@@ -302,7 +331,7 @@
             <input type="number" id="poBrokerCommission" placeholder="0" oninput="render()">
           </div>
         </div>
-        <div class="field-hint">Internal figures only — this section is not shown on Quotations or Invoices.</div>
+        <div class="field-hint">Internal figures only — kept separate from the customer-facing pricing above.</div>
       </div>
 
       <div class="panel" id="panelPayment">
@@ -318,7 +347,7 @@
       </div>
 
       <div class="panel" id="panelFinancialPO">
-        <h3><span class="num">4</span> Financial Details</h3>
+        <h3><span class="num">5</span> Financial Details</h3>
         <div class="field">
           <label>Source of Customer</label>
           <select id="poSource" onchange="render()">
@@ -344,7 +373,7 @@
       </div>
 
       <div class="panel" id="panelRemarksPO">
-        <h3><span class="num">5</span> Remarks</h3>
+        <h3><span class="num">6</span> Remarks</h3>
         <div class="field">
           <label>Comments / Remarks <span class="opt">(optional)</span></label>
           <textarea id="poRemarks" rows="3" placeholder="Any internal notes about this deal..." oninput="render()"></textarea>
@@ -352,7 +381,7 @@
       </div>
 
       <div class="panel" id="panelSignoffPO">
-        <h3><span class="num">6</span> Sign-Off</h3>
+        <h3><span class="num">7</span> Sign-Off</h3>
         <div class="field">
           <label>Sales Advisor Name</label>
           <input type="text" id="poSalesAdvisor" placeholder="e.g. Ahmad Faris" oninput="render()">
@@ -434,15 +463,16 @@ let lineItems = [
 
 // Panels shown per mode, in display order. Numbers on each panel's badge are assigned dynamically.
 const PANEL_DEFS = [
-  { id: 'panelCustomer',   modes: ['quotation', 'invoice', 'po'] },
-  { id: 'panelVehicle',    modes: ['quotation', 'invoice', 'po'] },
-  { id: 'panelLineItems',  modes: ['quotation', 'invoice'] },
-  { id: 'panelPricingPO',  modes: ['po'] },
-  { id: 'panelPayment',    modes: ['quotation', 'invoice'] },
-  { id: 'panelFinancialPO',modes: ['po'] },
-  { id: 'panelRemarksPO',  modes: ['po'] },
-  { id: 'panelSignoffPO',  modes: ['po'] },
-  { id: 'panelStampStatus',modes: ['quotation', 'invoice', 'po'] },
+  { id: 'panelCustomer',    modes: ['quotation', 'invoice', 'po'] },
+  { id: 'panelVehicle',     modes: ['quotation', 'invoice', 'po'] },
+  { id: 'panelLineItems',   modes: ['quotation', 'invoice'] },
+  { id: 'panelPricingPO',   modes: ['po'] },
+  { id: 'panelInternalPO',  modes: ['po'] },
+  { id: 'panelPayment',     modes: ['quotation', 'invoice'] },
+  { id: 'panelFinancialPO', modes: ['po'] },
+  { id: 'panelRemarksPO',   modes: ['po'] },
+  { id: 'panelSignoffPO',   modes: ['po'] },
+  { id: 'panelStampStatus', modes: ['quotation', 'invoice', 'po'] },
 ];
 
 function updatePanels(m) {
@@ -722,6 +752,7 @@ function render() {
 
     ${buildVehicleBlock(f.vehName, f.vehYear, f.vehColour, f.vehSpecs, f.vehMileage, f.vehChassis)}
 
+    <div class="doc-section-label">Price Breakdown</div>
     <table class="doc-table">
       <thead>
         <tr>
@@ -754,6 +785,7 @@ function render() {
         <strong>Terms:</strong> ${validityNote}<br>
         All vehicles are sourced directly from Japan with full auction grade sheets. Registration and road tax subject to JPJ processing.
       </div>
+      <div class="doc-section-label">Authorisation</div>
       <div class="doc-sign">
         <div class="doc-sign-block">
           <div style="height:36px;">${stampImageData ? `<img class="doc-stamp-img" src="${stampImageData}">` : ''}</div>
@@ -772,6 +804,13 @@ function render() {
 function renderPO() {
   const f = readCommonFields();
   const dateFmt = fmtDate(f.dateVal) || '—';
+
+  const sellingPrice = parseFloat(document.getElementById('poSellingPrice').value) || 0;
+  const roadTax = parseFloat(document.getElementById('poRoadTax').value) || 0;
+  const insurance = parseFloat(document.getElementById('poInsurance').value) || 0;
+  const processingFee = parseFloat(document.getElementById('poProcessingFee').value) || 0;
+  const interchangeFee = parseFloat(document.getElementById('poInterchangeFee').value) || 0;
+  const breakdownTotal = sellingPrice + roadTax + insurance + processingFee + interchangeFee;
 
   const basePrice = parseFloat(document.getElementById('poBasePrice').value) || 0;
   const saCommission = parseFloat(document.getElementById('poSaCommission').value) || 0;
@@ -793,9 +832,8 @@ function renderPO() {
   if (loanTenure) financialRows.push(`<div class="brow full"><span class="bkey">Loan Tenure</span><span class="bval">${escapeHtml(loanTenure)}</span></div>`);
 
   const remarksBlock = remarks ? `
-    <div class="doc-remarks">
-      <span class="rlabel">Remarks</span>${escapeHtml(remarks)}
-    </div>
+    <div class="doc-section-label">Remarks</div>
+    <div class="doc-remarks">${escapeHtml(remarks)}</div>
   ` : '';
 
   document.getElementById('document').innerHTML = `
@@ -815,7 +853,7 @@ function renderPO() {
 
     ${buildVehicleBlock(f.vehName, f.vehYear, f.vehColour, f.vehSpecs, f.vehMileage, f.vehChassis)}
 
-    <div class="doc-internal-tag">Internal Use Only — Pricing & Financial Breakdown</div>
+    <div class="doc-section-label">Pricing & Financial Breakdown</div>
     <table class="doc-table">
       <thead>
         <tr>
@@ -824,7 +862,27 @@ function renderPO() {
         </tr>
       </thead>
       <tbody>
-        <tr><td class="item-desc">Base Price</td><td class="right">${fmtMoney(basePrice)}</td></tr>
+        <tr><td class="item-desc">Selling Price</td><td class="right">${fmtMoney(sellingPrice)}</td></tr>
+        <tr><td class="item-desc">Road Tax</td><td class="right">${fmtMoney(roadTax)}</td></tr>
+        <tr><td class="item-desc">Insurance</td><td class="right">${fmtMoney(insurance)}</td></tr>
+        <tr><td class="item-desc">Processing Fee</td><td class="right">${fmtMoney(processingFee)}</td></tr>
+        <tr><td class="item-desc">Interchange Fee</td><td class="right">${fmtMoney(interchangeFee)}</td></tr>
+      </tbody>
+      <tfoot>
+        <tr><td>Total Amount</td><td class="right">${fmtMoney(breakdownTotal)}</td></tr>
+      </tfoot>
+    </table>
+
+    <div class="doc-section-label internal">Internal Tracking & Commission — Internal Use Only</div>
+    <table class="doc-table">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th class="right">Amount (RM)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="item-desc">Base Price (MYR)</td><td class="right">${fmtMoney(basePrice)}</td></tr>
         <tr><td class="item-desc">SA Commission</td><td class="right">${fmtMoney(saCommission)}</td></tr>
         <tr><td class="item-desc">Broker Commission</td><td class="right">${fmtMoney(brokerCommission)}</td></tr>
       </tbody>
@@ -833,8 +891,8 @@ function renderPO() {
       </tfoot>
     </table>
 
+    <div class="doc-section-label">Financial Details</div>
     <div class="doc-bank">
-      <div class="blabel">Financial Details</div>
       <div class="bgrid">
         ${financialRows.join('')}
       </div>
@@ -843,6 +901,7 @@ function renderPO() {
     ${remarksBlock}
 
     <div class="doc-footer" style="margin-top:0; padding-top:0; border-top:none;">
+      <div class="doc-section-label">Authorisation</div>
       <div class="doc-sign">
         <div class="doc-sign-block">
           <div style="height:36px;">${stampImageData ? `<img class="doc-stamp-img" src="${stampImageData}">` : ''}</div>
